@@ -232,7 +232,7 @@ if __name__ == '__main__':
     k1 = 2.0
     field_weights = [2.1,0.1] 
     k3 = 0.1
-
+    fp = open('./log.txt', 'w')
     # tuning rep_weights
     rep_weights = [1.1, 0.1, 3.0]
     init_rep_weights = [1.1, 0.1, 3.0]
@@ -242,15 +242,18 @@ if __name__ == '__main__':
         recalls = []
         for cnt in range(10):
             print rep_weights
+            fp.write(str(rep_weights))
             rep_weights[index] += 0.1
             recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
             print 'Recall: %f' %recall
+            fp.write('Recall: %f' %recall)
             recalls.append(recall)
         for i in range(len(recalls)):
             if r >= best_recall:
                 best_index = i
         rep_weights[index] = init_rep_weights[index] + best_index*0.1 
         print 'Best weights are', rep_weights
+        fp.write('Best weights are', rep_weights)
 
     # rep_weights are best now!
 
@@ -267,6 +270,7 @@ if __name__ == '__main__':
         k1 += cnt*0.1
         recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
         print k1, recall
+        fp.write(str(k1) + ', ' + str(recall))
         if recall >= bst_recall:
             bst_k1 = k1
 
@@ -277,6 +281,7 @@ if __name__ == '__main__':
         k3 += cnt*0.1
         recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
         print k3, recall
+        fp.write(str(k3) + ', ' + str(recall))
         if recall >= bst_recall:
             bst_k3 = k3
     
@@ -298,12 +303,13 @@ if __name__ == '__main__':
                 best_index = i
         field_weights[index] = init_field_weights[index] + best_index*0.1 
         print 'Best weights are', field_weights
+        fp.write('Best weights are', field_weights)
 
     k1 = bst_k1
     k3 = bst_k3
     recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
     # recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
-    
+    fp.close()
 
 
     '''
