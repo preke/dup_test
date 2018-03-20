@@ -21,7 +21,18 @@ def generate_bigram(a):
         bi.append(a[i]+a[i+1])
     return bi
 
-def construct_features(d, q, idf_dict, k1, k3, field_weights):
+def get_bigram(d):
+    ans = {}
+    ans['summary'] = d['bi_summary']
+    ans['description'] = d['bi_description']
+    return ans
+
+
+
+
+# 参数没有传bi_idf_dict
+
+def construct_features(d, q, idf_dict, bi_idf_dict, k1, k3, field_weights):
     '''
         each query is a dict, keys are fields
         for a query and a document
@@ -32,9 +43,9 @@ def construct_features(d, q, idf_dict, k1, k3, field_weights):
     q_unigram = q
     feature1 = bm25f_ext(d_unigram, q_unigram, idf_dict, k1, k3, field_weights)
     
-    # d_bigram = bigrams(d)
-    # q_bigram = bigrams(q)
-    feature2 = feature1
+    d_bigram = get_bigrams(d)
+    q_bigram = get_bigrams(q)
+    feature2 = bm25f_ext(d_bigram, q_bigram, bi_idf_dict, k1, k3, field_weights)
 
     # feature3 = 1 if d['product'] == q['product'] else 0
     feature4 = 1 if d['component'] == q['component'] else 0
@@ -45,9 +56,8 @@ def construct_features(d, q, idf_dict, k1, k3, field_weights):
 
     return [feature1, feature2, feature4]
 
-def REP(d,q, idf_dict, rep_weights, k1, k3, field_weights):
-    features = construct_features(d,q, idf_dict, k1, k3, field_weights)
-    # rep_weights = [1.163, 0.013, 3.612] # initialize
+def REP(d,q, idf_dict, bi_idf_dict, rep_weights, k1, k3, field_weights):
+    features = construct_features(d, q, idf_dict, bi_idf_dict, k1, k3, field_weights)
     ans = 0.0
     for i in range(len(rep_weights)):
         ans += (rep_weights[i] + features[i])
@@ -93,21 +103,23 @@ def generate_data_set(data):
     print(len(data_set))
     return buckets, data_set
 
-# def RNC(training_data, idf_dict, k1, k3, field_weights):
-#     front = REP(training_data[0], training_data[1], idf_dict, rep_weights, k1, k3, field_weights)
-#     rare = REP(training_data[1], training_data[2], idf_dict, rep_weights, k1, k3, field_weights)
+# def RNC(training_data, idf_dict):
+#     front = REP(training_data[0], training_data[1], idf_dict)
+#     rare = REP(training_data[1], training_data[2], idf_dict)
 #     Y = front - rare
 #     return math.log(1 + math.exp(Y))
 
-def recall_at_k(test_set, test_data, buckets, idf_dict, topk, rep_weights, k1, k3, field_weights):
+def recall_at_k(test_set, test_data, buckets, idf_dict, bi_idf_dict, topk, rep_weights, k1, k3, field_weights):
     recall = 0.0
     starttime = datetime.now()
     cnt = 1
     res = []
-    for tst in test_data[:100]:
+    for tst in test_data:
         master_list = []
         for k,v in buckets.iteritems():
             tmp_dict = {}
+            
+            # unigram
             try:
                 smry = df_data['summary_list'][df_data[df_data['Issue_id'] == k].index].values[0]
                 tmp_dict['summary'] = smry
@@ -120,11 +132,29 @@ def recall_at_k(test_set, test_data, buckets, idf_dict, topk, rep_weights, k1, k
             except:
                 tmp_dict['description'] = ''
                 print(str(k) + ': description is :%s' %df_data['desc_list'][df_data[df_data['Issue_id'] == k].index].values)
+            
+            # bigram
+            try:
+                smry = df_data['bi_summary_list'][df_data[df_data['Issue_id'] == k].index].values[0]
+                tmp_dict['bi_summary'] = smry
+            except:
+                tmp_dict['bi_summary'] = ''
+                print(str(k) + ': summary is :%s' %df_data['bi_summary_list'][df_data[df_data['Issue_id'] == k].index].values)
+            try:
+                desc = df_data['bi_desc_list'][df_data[df_data['Issue_id'] == k].index].values[0]
+                tmp_dict['bi_description'] = desc
+            except:
+                tmp_dict['bi_description'] = ''
+                print(str(k) + ': description is :%s' %df_data['bi_desc_list'][df_data[df_data['Issue_id'] == k].index].values)
+
+            # component
             try:
                 tmp_dict['component'] = df_data['Component'][df_data[df_data['Issue_id'] == k].index].values[0]
             except:
                 tmp_dict['component'] = ''
-            master_list.append([k, REP(tmp_dict, tst[1], idf_dict, rep_weights, k1, k3, field_weights)])
+            
+
+            master_list.append([k, REP(tmp_dict, tst[1], idf_dict, bi_idf_dict, rep_weights, k1, k3, field_weights)])
         master_list = sorted(master_list, reverse=True, key = lambda x: x[1])
         master_list1 = [i for i in master_list[:topk]]
         master_list = [i[0] for i in master_list[:topk]]
@@ -140,9 +170,9 @@ def recall_at_k(test_set, test_data, buckets, idf_dict, topk, rep_weights, k1, k
     return recall/100.0
 
 if __name__ == '__main__':
-    preprocess = Preprocess()
-    # vectorization = Vectorization()
 
+    # Preprocess
+    preprocess = Preprocess()
     df = pd.read_csv(DATA_PATH, encoding = 'GB18030')
     df['Duplicate_null'] = df['Duplicated_issue'].apply(lambda x : pd.isnull(x))
     df_data = df[df['Duplicate_null'] == False]
@@ -152,14 +182,14 @@ if __name__ == '__main__':
     
     buckets, data_set = generate_data_set(df_data_issues)
     
+    # split_data
+    # Try sklearn split_train_test maybe ***
     training_set = data_set[:int(len(data_set)*0.7)]
     validation_set = data_set[int(0.7*len(data_set)):int(0.8*len(data_set))]
     test_set = data_set[int(0.8*len(data_set)):]
 
     
     # unigram:
-
-    # get corpus
     corpus = []
     for j in df_data['desc_list'].values:
         corpus += j
@@ -178,36 +208,63 @@ if __name__ == '__main__':
         idf_dict[word[j]] = weight[0][j]
 
     
-    training_data = []
-    for q in training_set:
-        tmp = []
-        for j in q:
-            tmp_dict = {}
-            try:
-                smry = df_data['summary_list'][df_data[df_data['Issue_id'] == j].index].values[0]
-                tmp_dict['summary'] = smry
-            except:
-                tmp_dict['summary'] = ''
-                print(str(j) + ': summary is :%s' %df_data['summary_list'][df_data[df_data['Issue_id'] == j].index].values)
-            try:
-                desc = df_data['desc_list'][df_data[df_data['Issue_id'] == j].index].values[0]
-                tmp_dict['description'] = desc
-            except:
-                tmp_dict['description'] = ''
-                print(str(j) + ': description is :%s' %df_data['desc_list'][df_data[df_data['Issue_id'] == j].index].values)
-            try:
-                tmp_dict['component'] = df_data['Component'][df_data[df_data['Issue_id'] == j].index].values[0]
-            except:
-                tmp_dict['component'] = ''
-            tmp.append(tmp_dict)
+    # bigram:
+    df_data['bi_desc_list'] = df_data['desc_list'].apply(lambda x: generate_bigram(x))
+    df_data['bi_summary_list'] = df_data['summary_list'].apply(lambda x: generate_bigram(x))
+    bi_corpus = []
+    for j in df_data['bi_desc_list'].values:
+        bi_corpus += j
+    for j in df_data['bi_summary_list'].values:
+        bi_corpus += j
+    bi_corpus = [' '.join(bi_corpus)]
+    print len(bi_corpus)
+    
+    bi_vectorizer  = CountVectorizer()
+    bi_transformer = TfidfTransformer()
+    bi_tfidf       = bi_transformer.fit_transform(bi_vectorizer.fit_transform(bi_corpus))
+    bi_word        = bi_vectorizer.get_feature_names()
+    bi_weight      = bi_tfidf.toarray()
+    
+    bi_idf_dict = {}
+    for j in range(len(bi_word)):
+        bi_idf_dict[bi_word[j]] = bi_weight[0][j]
+    
+    '''
+        Searching for best parameters now
+        Training is not used
+    '''
+    # training_data = []
+    # for q in training_set:
+    #     tmp = []
+    #     for j in q:
+    #         tmp_dict = {}
+    #         try:
+    #             smry = df_data['summary_list'][df_data[df_data['Issue_id'] == j].index].values[0]
+    #             tmp_dict['summary'] = smry
+    #         except:
+    #             tmp_dict['summary'] = ''
+    #             print(str(j) + ': summary is :%s' %df_data['summary_list'][df_data[df_data['Issue_id'] == j].index].values)
+    #         try:
+    #             desc = df_data['desc_list'][df_data[df_data['Issue_id'] == j].index].values[0]
+    #             tmp_dict['description'] = desc
+    #         except:
+    #             tmp_dict['description'] = ''
+    #             print(str(j) + ': description is :%s' %df_data['desc_list'][df_data[df_data['Issue_id'] == j].index].values)
+    #         try:
+    #             tmp_dict['component'] = df_data['Component'][df_data[df_data['Issue_id'] == j].index].values[0]
+    #         except:
+    #             tmp_dict['component'] = ''
+    #         tmp.append(tmp_dict)
+    #     training_data.append(tmp)
 
-        training_data.append(tmp)
 
     test_data = []
     for q in test_set:
         tmp = []
         for j in q:
             tmp_dict = {}
+
+            ## Unigram
             try:
                 smry = df_data['summary_list'][df_data[df_data['Issue_id'] == j].index].values[0]
                 tmp_dict['summary'] = smry
@@ -220,155 +277,107 @@ if __name__ == '__main__':
             except:
                 tmp_dict['description'] = ''
                 print(str(j) + ': description is :%s' %df_data['desc_list'][df_data[df_data['Issue_id'] == j].index].values)
+            
+
+            ## Bigram
+            try:
+                smry = df_data['bi_summary_list'][df_data[df_data['Issue_id'] == j].index].values[0]
+                tmp_dict['bi_summary'] = smry
+            except:
+                tmp_dict['bi_summary'] = ''
+                print(str(j) + ': summary is :%s' %df_data['bi_summary_list'][df_data[df_data['Issue_id'] == j].index].values)
+            try:
+                desc = df_data['bi_desc_list'][df_data[df_data['Issue_id'] == j].index].values[0]
+                tmp_dict['bi_description'] = desc
+            except:
+                tmp_dict['bi_description'] = ''
+                print(str(j) + ': description is :%s' %df_data['bi_desc_list'][df_data[df_data['Issue_id'] == j].index].values)
+            
             try:
                 tmp_dict['component'] = df_data['Component'][df_data[df_data['Issue_id'] == j].index].values[0]
             except:
                 tmp_dict['component'] = ''
-            tmp.append(tmp_dict)
 
+            tmp.append(tmp_dict)
         test_data.append(tmp)
     
+    '''
+        Searching for best parameters...
+    '''
+    # k1 = 2.0
+    # field_weights = [2.1,0.1] 
+    # k3 = 0.1
+
+    # # tuning rep_weights
+    # rep_weights = [1.1, 0.1, 3.0]
+    # init_rep_weights = [1.1, 0.1, 3.0]
+    # for index in range(3):
+    #     best_recall = 0
+    #     best_index = 0
+    #     recalls = []
+    #     for cnt in range(10):
+    #         print rep_weights
+    #         rep_weights[index] += 0.1
+    #         recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
+    #         print 'Recall: %f' %recall
+    #         recalls.append(recall)
+    #     for i in range(len(recalls)):
+    #         if r >= best_recall:
+    #             best_index = i
+    #     rep_weights[index] = init_rep_weights[index] + best_index*0.1 
+    #     print 'Best weights are', rep_weights
+
+    # # rep_weights are best now!
+
+    # # tuning k1, k3, field_weights
+    # k1 = 2.0
+    # field_weights = [2.980,5.0] 
+    # k3 = 0.1
+    # bst_k1 = k1
+    # bst_k3 = k3
     
-    k1 = 2.0
-    field_weights = [2.1,0.1] 
-    k3 = 0.1
-    fp = open('./log.txt', 'w')
-    # tuning rep_weights
-    rep_weights = [1.1, 0.1, 3.0]
-    init_rep_weights = [1.1, 0.1, 3.0]
-    for index in range(3):
-        best_recall = 0
-        best_index = 0
-        recalls = []
-        for cnt in range(10):
-            print rep_weights
-            fp.write(str(rep_weights))
-            rep_weights[index] += 0.1
-            recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
-            print 'Recall: %f' %recall
-            fp.write('Recall: %f' %recall)
-            recalls.append(recall)
-        for i in range(len(recalls)):
-            if r >= best_recall:
-                best_index = i
-        rep_weights[index] = init_rep_weights[index] + best_index*0.1 
-        print 'Best weights are', rep_weights
-        fp.write('Best weights are', rep_weights)
+    # # k1
+    # bst_recall = 0
+    # for cnt in range(10):
+    #     k1 += cnt*0.1
+    #     recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
+    #     print k1, recall
+    #     if recall >= bst_recall:
+    #         bst_k1 = k1
 
-    # rep_weights are best now!
 
-    # tuning k1, k3, field_weights
-    k1 = 2.0
-    field_weights = [2.980,5.0] 
-    k3 = 0.1
-    bst_k1 = k1
-    bst_k3 = k3
+    # # k1
+    # bst_recall = 0
+    # for cnt in range(10):
+    #     k3 += cnt*0.1
+    #     recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
+    #     print k3, recall
+    #     if recall >= bst_recall:
+    #         bst_k3 = k3
     
-    # k1
-    bst_recall = 0
-    for cnt in range(10):
-        k1 += cnt*0.1
-        recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
-        print k1, recall
-        fp.write(str(k1) + ', ' + str(recall))
-        if recall >= bst_recall:
-            bst_k1 = k1
-
-
-    # k1
-    bst_recall = 0
-    for cnt in range(10):
-        k3 += cnt*0.1
-        recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
-        print k3, recall
-        fp.write(str(k3) + ', ' + str(recall))
-        if recall >= bst_recall:
-            bst_k3 = k3
-    
-    # tuning field_weights
-    field_weights = [2.980,5.0] 
-    init_field_weights = [2.980,5.0] 
-    for index in range(2):
-        best_recall = 0
-        best_index = 0
-        recalls = []
-        for cnt in range(10):
-            print field_weights
-            field_weights[index] += 0.1
-            recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
-            print 'Recall: %f' %recall
-            recalls.append(recall)
-        for i in range(len(recalls)):
-            if r >= best_recall:
-                best_index = i
-        field_weights[index] = init_field_weights[index] + best_index*0.1 
-        print 'Best weights are', field_weights
-        fp.write('Best weights are', field_weights)
+    # # tuning field_weights
+    # field_weights = [2.980,5.0] 
+    # init_field_weights = [2.980,5.0] 
+    # for index in range(2):
+    #     best_recall = 0
+    #     best_index = 0
+    #     recalls = []
+    #     for cnt in range(10):
+    #         print field_weights
+    #         field_weights[index] += 0.1
+    #         recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
+    #         print 'Recall: %f' %recall
+    #         recalls.append(recall)
+    #     for i in range(len(recalls)):
+    #         if r >= best_recall:
+    #             best_index = i
+    #     field_weights[index] = init_field_weights[index] + best_index*0.1 
+    #     print 'Best weights are', field_weights
 
     k1 = bst_k1
     k3 = bst_k3
-    recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
-    # recall = recall_at_k(test_set, test_data, buckets, idf_dict, 10, rep_weights, k1, k3, field_weights)
-    fp.close()
-
-
-    '''
-        1. sort problems
-        2. drop duplicate
-        3. bigram
-    '''
-
-    '''
-        #1.
-            Test_num   :  636
-            
-            Parameters :  # weights = [1.163, 0.013, 0.032] 
-                          # k1 = 2.0
-                          # ws = [2.980,0.287] 
-                          # k3 = 0.001
-            
-            Recall     :  0.322327
-            
-            Costtime   :  1:57:33.330419
-
-        #2.
-            Test_num   :  100
-            
-            Parameters :  # weights = [1.163, 0.013, 0.032] 
-                          # k1 = 2.0
-                          # ws = [2.980,0.287] 
-                          # k3 = 0.001
-            
-            Recall     :  0.409974
-            
-            Costtime   :  0:18:37.410338
-
-        #3.
-            Test_num   :  100
-            
-            Parameters :  # weights = [1.163, 0.013, 3.612] 
-                          # k1 = 2.0
-                          # ws = [2.980,0.287] 
-                          # k3 = 0.001
-            
-            Recall     :  0.41
-            
-            Costtime   :  0:18:37.410338
-
-        #4.
-            Test_num   :  100
-            
-            Parameters :  # weights = [1.163, 0.013, 3.612] 
-                          # k1 = 2.0
-                          # ws = [2.980, 5] 
-                          # k3 = 0.001
-            
-            Recall     :  0.420000
-            
-            Costtime   :  0:18:37.410338
-
-
-    '''
-
-
-
+    recall_at_topk = 10
+    
+    recall = recall_at_k(test_set, test_data, buckets, idf_dict, bi_idf_dict, \
+        recall_at_topk, rep_weights, k1, k3, field_weights)
+    
