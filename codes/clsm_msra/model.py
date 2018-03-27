@@ -13,7 +13,7 @@ class CNN_clsm(nn.Module):
         
         Ci = 1 # Channel in
         Co = args.kernel_num # 300
-        K  = args.kernel_sizes # 3
+        K  = args.kernel_size # 3
         D  = args.tri_letter_length
         Ss = args.sementic_size
         
