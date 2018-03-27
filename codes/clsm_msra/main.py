@@ -13,9 +13,10 @@ import traceback
 from word_hashing import WordHashing
 from model import CNN_clsm
 from load_data import load_data
+from train import train
 
 Data_path = '../../data/spark.csv'
-Train_path = '../datas/train_set.csv'
+Train_path = './datas/train_set.csv'
 
 parser = argparse.ArgumentParser(description='')
 # learning
@@ -40,18 +41,20 @@ parser.add_argument('-device', type=int, default=0, help='device to use for iter
 parser.add_argument('-no-cuda', action='store_true', default=False, help='disable the gpu')
 args = parser.parse_args()
 
-
-args.tri_letter_length = load_data(data_path=Data_path, prefix='SPARK', neg_num=5)
 args.sementic_size = 128    
+
+if os.path.exists(Train_path):
+    args.tri_letter_length = 15419    
+else:
+    print('Loading data begin.')
+    args.tri_letter_length = load_data(data_path=Data_path, prefix='SPARK', neg_num=5)
+    print('Loading data done.')
 
 cnn = CNN_clsm(args)
 args.cuda = (not args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
 if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
-
-
-
 
 train_data = pd.read(Train_path, encoding='gb18030', header=[])
 train_iter= data.Iterator.splits(
@@ -61,7 +64,8 @@ train_iter= data.Iterator.splits(
                             repeat=False)
 
 
-args.save_dir     = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 
+train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
 
 
