@@ -17,7 +17,7 @@ def train(train_iter, vali_iter, model, args):
         logger.info('Epoch:%s\n'%epoch)
         for batch in train_iter:
             query, doc_list = batch.query, batch.doc_list
-            query.t_()
+            query = query.t_()
             doc_list = [doc.t_() for doc in doc_list]
             # feature1.data.t_(), feature2.data.t_(), target.data.sub_(1), pairid.data.t_()# batch first, index align
             if args.cuda:
