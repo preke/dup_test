@@ -67,4 +67,6 @@ def load_data(data_path, prefix, neg_num=5):
     data_set.head(int(ratio*len(data_set))).to_csv('../datas/train_set.csv', index=False)
     data_set.tail(int((1-ratio)*len(data_set))).to_csv('../datas/test_set.csv', index=False)
 
+    # the length of tri-letter vectors
+    return len(data_set.ix[0]['query_hashing_list'][0])
 

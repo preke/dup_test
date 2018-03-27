@@ -34,20 +34,22 @@ parser.add_argument('-shuffle', action='store_true', default=False, help='shuffl
 parser.add_argument('-dropout', type=float, default=0.5, help='the probability for dropout [default: 0.5]')
 parser.add_argument('-max-norm', type=float, default=3.0, help='l2 constraint of parameters [default: 3.0]')
 parser.add_argument('-kernel-num', type=int, default=300, help='number of each kind of kernel')
-parser.add_argument('-kernel-sizes', type=str, default=3, help='comma-separated kernel size to use for convolution')
+parser.add_argument('-kernel-size', type=str, default=3, help='comma-separated kernel size to use for convolution')
 # device
 parser.add_argument('-device', type=int, default=0, help='device to use for iterate data, -1 mean cpu [default: -1]')
 parser.add_argument('-no-cuda', action='store_true', default=False, help='disable the gpu')
 args = parser.parse_args()
-
+    
+cnn = CNN_clsm(args)
 args.cuda = (not args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
 if args.cuda:
     torch.cuda.set_device(args.device)
-args.tri_letter_length = 100
+    cnn = cnn.cuda()
 
-cnn = CNN_clsm(args)
 
-load_data(Data_path)
+args.tri_letter_length = load_data(Data_path)
+args.sementic_size = 128
+
 train_data = pd.read(Train_path, encoding='gb18030', header=[])
 train_iter= data.Iterator.splits(
                             train_data, 
