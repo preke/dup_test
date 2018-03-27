@@ -14,7 +14,7 @@ from word_hashing import WordHashing
 from model import CNN_clsm
 from load_data import load_data
 
-Data_path = '../../../datas/spark.csv'
+Data_path = '../../data/spark.csv'
 Train_path = '../datas/train_set.csv'
 
 parser = argparse.ArgumentParser(description='')
@@ -43,7 +43,6 @@ args = parser.parse_args()
 args.cuda = (not args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
 if args.cuda:
     torch.cuda.set_device(args.device)
-    cnn = cnn.cuda()
 args.tri_letter_length = 100
 
 cnn = CNN_clsm(args)
