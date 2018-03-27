@@ -56,7 +56,7 @@ if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
 
-train_data = pd.read(Train_path, encoding='gb18030', header=[])
+train_data = pd.read_csv(Train_path, encoding='gb18030', header=[])
 train_iter= data.Iterator.splits(
                             train_data, 
                             batch_sizes=args.batch_size,
