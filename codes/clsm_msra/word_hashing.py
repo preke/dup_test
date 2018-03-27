@@ -34,7 +34,7 @@ class WordHashing(object):
         
         # convert all dict-values into indexs
         cnt = 0
-        for k,v in self.trigram_dict.iteritems():
+        for k,v in self.trigram_dict.items():
             self.trigram_dict[k] = cnt
             cnt += 1
 
