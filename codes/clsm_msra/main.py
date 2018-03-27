@@ -39,7 +39,11 @@ parser.add_argument('-kernel-size', type=str, default=3, help='comma-separated k
 parser.add_argument('-device', type=int, default=0, help='device to use for iterate data, -1 mean cpu [default: -1]')
 parser.add_argument('-no-cuda', action='store_true', default=False, help='disable the gpu')
 args = parser.parse_args()
-    
+
+
+args.tri_letter_length = load_data(Data_path)
+args.sementic_size = 128    
+
 cnn = CNN_clsm(args)
 args.cuda = (not args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
 if args.cuda:
@@ -47,8 +51,7 @@ if args.cuda:
     cnn = cnn.cuda()
 
 
-args.tri_letter_length = load_data(Data_path)
-args.sementic_size = 128
+
 
 train_data = pd.read(Train_path, encoding='gb18030', header=[])
 train_iter= data.Iterator.splits(
