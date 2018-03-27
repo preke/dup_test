@@ -14,6 +14,7 @@ from word_hashing import WordHashing
 from model import CNN_clsm
 from load_data import load_data
 
+Data_path = '../../../datas/spark.csv'
 Train_path = '../datas/train_set.csv'
 
 parser = argparse.ArgumentParser(description='')
@@ -47,7 +48,7 @@ args.tri_letter_length = 100
 
 cnn = CNN_clsm(args)
 
-load_data()
+load_data(Data_path)
 train_data = pd.read(Train_path, encoding='gb18030', header=[])
 train_iter= data.Iterator.splits(
                             train_data, 
