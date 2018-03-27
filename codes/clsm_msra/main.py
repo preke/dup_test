@@ -41,7 +41,7 @@ parser.add_argument('-no-cuda', action='store_true', default=False, help='disabl
 args = parser.parse_args()
 
 
-args.tri_letter_length = load_data(Data_path)
+args.tri_letter_length = load_data(data_path=Data_path, prefix='SPARK', neg_num=5)
 args.sementic_size = 128    
 
 cnn = CNN_clsm(args)
