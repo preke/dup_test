@@ -67,11 +67,11 @@ train_data = data.TabularDataset(
                                 path=Train_path, 
                                 format='CSV',
                                 fields=[('query_hashing_list', query), ('docs_hashing_list', doc_list)])
-train_iter= data.Iterator.splits(
-                                train_data, 
-                                batch_sizes=args.batch_size,
-                                device=-1, 
-                                repeat=False)
+train_iter= data.Iterator(
+                            train_data, 
+                            batch_sizes=args.batch_size,
+                            device=-1, 
+                            repeat=False)
 
 
 args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
