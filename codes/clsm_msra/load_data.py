@@ -62,8 +62,18 @@ def load_data(data_path, prefix, neg_num=5):
         lambda x: [wh_instance.hashing(i) for i in x.split(' ')])
     data_set['docs_hashing_list'] = data_set['doc_list'].apply(\
         lambda x: [[wh_instance.hashing(i) for i in doc.split(' ')] for doc in x])
+    data_set['pos_doc'] = data_set['docs_hashing_list'].apply(lambda x: x[0])
 
-    data_set = data_set[['query_hashing_list', 'docs_hashing_list']]
+    data_set['neg_doc_1'] = data_set['docs_hashing_list'].apply(lambda x: x[1])
+    data_set['neg_doc_2'] = data_set['docs_hashing_list'].apply(lambda x: x[2])
+    data_set['neg_doc_3'] = data_set['docs_hashing_list'].apply(lambda x: x[3])
+    data_set['neg_doc_4'] = data_set['docs_hashing_list'].apply(lambda x: x[4])
+    data_set['neg_doc_5'] = data_set['docs_hashing_list'].apply(lambda x: x[5])
+
+
+
+    data_set = data_set[['query_hashing_list', 'pos_doc', \
+                'neg_doc_1', 'neg_doc_2', 'neg_doc_3', 'neg_doc_4', 'neg_doc_5']]
     ratio = 0.8 # train set ratio
     data_set.head(int(ratio*len(data_set))).to_csv('./datas/train_set.csv', index=False)
     data_set.tail(int((1-ratio)*len(data_set))).to_csv('./datas/test_set.csv', index=False)

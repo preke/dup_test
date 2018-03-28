@@ -61,20 +61,34 @@ if args.cuda:
 
 # train_data = pd.read_csv(Train_path, encoding='gb18030', header=None)
 
-query = data.Field(sequential=True, use_vocab=False, batch_first=True)
-doc_list = data.Field(sequential=True, use_vocab=False, batch_first=True)
+query    = data.Field(sequential=True, use_vocab=False, batch_first=True)
+pos_doc  = data.Field(sequential=True, use_vocab=False, batch_first=True)
+neg_doc1 = data.Field(sequential=True, use_vocab=False, batch_first=True)
+neg_doc2 = data.Field(sequential=True, use_vocab=False, batch_first=True)
+neg_doc3 = data.Field(sequential=True, use_vocab=False, batch_first=True)
+neg_doc4 = data.Field(sequential=True, use_vocab=False, batch_first=True)
+neg_doc5 = data.Field(sequential=True, use_vocab=False, batch_first=True)
+
 train_data = data.TabularDataset(
                                 path=Train_path, 
                                 format='CSV',
-                                fields=[('query_hashing_list', query), ('docs_hashing_list', doc_list)])
+                                fields=[('query_hashing_list', query), 
+                                        ('pos_doc', pos_doc),
+                                        ('neg_doc_1', neg_doc1),
+                                        ('neg_doc_2', neg_doc2),
+                                        ('neg_doc_3', neg_doc3),
+                                        ('neg_doc_4', neg_doc4),
+                                        ('neg_doc_5', neg_doc5)
+                                        ])
+
 train_iter= data.Iterator(
-                            train_data, 
+                            train_data,
                             batch_size=args.batch_size,
                             device=-1, 
                             repeat=False)
 
 
 args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
-train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
+# train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
 
 

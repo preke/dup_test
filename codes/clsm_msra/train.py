@@ -16,6 +16,7 @@ def train(train_iter, vali_iter, model, args):
     for epoch in range(1, args.epochs+1):
         print('Epoch:%s\n'%epoch)
         for batch in train_iter:
+            print(batch.shape)
             query, doc_list = batch.query, batch.doc_list
             query = query.t_()
             doc_list = [doc.t_() for doc in doc_list]
