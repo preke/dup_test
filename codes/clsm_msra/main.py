@@ -60,7 +60,7 @@ if args.cuda:
 train_data = data.TabularDataset(
                                 path=Train_path, 
                                 format='CSV',
-                                field=['query_hashing_list', 'docs_hashing_list'])
+                                fields=['query_hashing_list', 'docs_hashing_list'])
 train_iter= data.Iterator.splits(
                                 train_data, 
                                 batch_sizes=args.batch_size,
