@@ -14,7 +14,7 @@ def train(train_iter, vali_iter, model, args):
     last_step = 0
     model.train()
     for epoch in range(1, args.epochs+1):
-        logger.info('Epoch:%s\n'%epoch)
+        print('Epoch:%s\n'%epoch)
         for batch in train_iter:
             query, doc_list = batch.query, batch.doc_list
             query = query.t_()
