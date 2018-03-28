@@ -14,6 +14,9 @@ from word_hashing import WordHashing
 from model import CNN_clsm
 from load_data import load_data
 from train import train
+import sys
+import csv
+csv.field_size_limit(sys.maxsize)
 
 Data_path = '../../data/spark.csv'
 Train_path = './datas/train_set.csv'
@@ -72,7 +75,6 @@ train_iter= data.Iterator.splits(
 
 
 args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
-
 train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
 
 
