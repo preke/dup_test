@@ -20,7 +20,7 @@ def train(train_iter, vali_iter, model, args):
             batch.query, batch.pos_doc, batch.neg_doc1, batch.neg_doc2, batch.neg_doc3, batch.neg_doc4, batch.neg_doc5
             query.t_(), pos_doc.t_(), neg_doc1.t_(), neg_doc2.t_(), neg_doc3.t_(), neg_doc4.t_(), neg_doc5.t_()
             if args.cuda:
-                query, pos_doc, neg_doc1, neg_doc2, neg_doc3, neg_doc4, neg_doc5 = 
+                query, pos_doc, neg_doc1, neg_doc2, neg_doc3, neg_doc4, neg_doc5 = \
                 query.cuda(), pos_doc.cuda(), neg_doc1.cuda(), neg_doc2.cuda(), neg_doc3.cuda(), neg_doc4.cuda(), neg_doc5.cuda()
             
             optimizer.zero_grad()
@@ -29,7 +29,7 @@ def train(train_iter, vali_iter, model, args):
             results = torch.cat([results, model(query, neg_doc3)])
             results = torch.cat([results, model(query, neg_doc4)])
             results = torch.cat([results, model(query, neg_doc5)])
-            
+
             criterion = nn.NLLLoss()
             loss = criterion(nn.LogSoftmax(results[0]))
             loss.backward()
