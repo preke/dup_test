@@ -69,7 +69,7 @@ train_data = data.TabularDataset(
                                 fields=[('query_hashing_list', query), ('docs_hashing_list', doc_list)])
 train_iter= data.Iterator(
                             train_data, 
-                            batch_sizes=args.batch_size,
+                            batch_size=args.batch_size,
                             device=-1, 
                             repeat=False)
 
