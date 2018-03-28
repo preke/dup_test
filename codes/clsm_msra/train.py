@@ -16,16 +16,20 @@ def train(train_iter, vali_iter, model, args):
     for epoch in range(1, args.epochs+1):
         print('Epoch:%s\n'%epoch)
         for batch in train_iter:
-            print(batch.shape)
-            query, doc_list = batch.query, batch.doc_list
-            query = query.t_()
-            doc_list = [doc.t_() for doc in doc_list]
-            # feature1.data.t_(), feature2.data.t_(), target.data.sub_(1), pairid.data.t_()# batch first, index align
+            query, pos_doc, neg_doc1, neg_doc2, neg_doc3, neg_doc4, neg_doc5 = \
+            batch.query, batch.pos_doc, batch.neg_doc1, batch.neg_doc2, batch.neg_doc3, batch.neg_doc4, batch.neg_doc5
+            query.t_(), pos_doc.t_(), neg_doc1.t_(), neg_doc2.t_(), neg_doc3.t_(), neg_doc4.t_(), neg_doc5.t_()
             if args.cuda:
-                query, doc_list = query.cuda(), doc_list.cuda()
-
+                query, pos_doc, neg_doc1, neg_doc2, neg_doc3, neg_doc4, neg_doc5 = 
+                query.cuda(), pos_doc.cuda(), neg_doc1.cuda(), neg_doc2.cuda(), neg_doc3.cuda(), neg_doc4.cuda(), neg_doc5.cuda()
+            
             optimizer.zero_grad()
-            results = Variable(torch.Tensor([model(feature1, doc) for doc in doc_list]))
+            results = torch.cat([model(query, pos_doc), model(query, neg_doc1)])
+            results = torch.cat([results, model(query, neg_doc2)])
+            results = torch.cat([results, model(query, neg_doc3)])
+            results = torch.cat([results, model(query, neg_doc4)])
+            results = torch.cat([results, model(query, neg_doc5)])
+            
             criterion = nn.NLLLoss()
             loss = criterion(nn.LogSoftmax(results[0]))
             loss.backward()

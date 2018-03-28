@@ -51,6 +51,7 @@ if os.path.exists(Train_path):
 else:
     print('Loading data begin.')
     args.tri_letter_length = load_data(data_path=Data_path, prefix='SPARK', neg_num=5)
+    print(args.tri_letter_length)
     print('Loading data done.')
 
 cnn = CNN_clsm(args)
@@ -89,6 +90,6 @@ train_iter= data.Iterator(
 
 
 args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
-# train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
+train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
 
 
