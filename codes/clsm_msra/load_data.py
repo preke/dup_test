@@ -63,6 +63,7 @@ def load_data(data_path, prefix, neg_num=5):
     data_set['docs_hashing_list'] = data_set['doc_list'].apply(\
         lambda x: [[wh_instance.hashing(i) for i in doc.split(' ')] for doc in x])
 
+    data_set = data_set[['query_hashing_list', 'docs_hashing_list']]
     ratio = 0.8 # train set ratio
     data_set.head(int(ratio*len(data_set))).to_csv('./datas/train_set.csv', index=False)
     data_set.tail(int((1-ratio)*len(data_set))).to_csv('./datas/test_set.csv', index=False)

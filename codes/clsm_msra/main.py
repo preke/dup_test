@@ -56,12 +56,16 @@ if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
 
-train_data = pd.read_csv(Train_path, encoding='gb18030', header=None)
+# train_data = pd.read_csv(Train_path, encoding='gb18030', header=None)
+train_data = data.TabularDataset(
+                                path=Train_path, 
+                                format='CSV',
+                                field=['query_hashing_list', 'docs_hashing_list'])
 train_iter= data.Iterator.splits(
-                            train_data, 
-                            batch_sizes=args.batch_size,
-                            device=-1, 
-                            repeat=False)
+                                train_data, 
+                                batch_sizes=args.batch_size,
+                                device=-1, 
+                                repeat=False)
 
 
 args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
