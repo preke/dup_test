@@ -61,8 +61,8 @@ if args.cuda:
 
 # train_data = pd.read_csv(Train_path, encoding='gb18030', header=None)
 
-query = data.Field(sequential=True, batch_first=True)
-doc_list = data.Field(sequential=True, batch_first=True)
+query = data.Field(sequential=True, use_vocab=False, batch_first=True)
+doc_list = data.Field(sequential=True, use_vocab=False, batch_first=True)
 train_data = data.TabularDataset(
                                 path=Train_path, 
                                 format='CSV',
