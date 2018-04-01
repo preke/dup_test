@@ -18,7 +18,7 @@ class CNN_clsm(nn.Module):
         Ss = args.sementic_size
         V  = args.embedding_num
 
-        self.embedding = nn.embedding(V, D)
+        self.embedding = nn.Embedding(V, D)
         self.embedding.weight.data.copy_(wordvec_matrix)
         self.embedding.weight.requires_grad = False
 
