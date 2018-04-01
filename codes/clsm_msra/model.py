@@ -37,6 +37,7 @@ class CNN_clsm(nn.Module):
         sentences_batch = sentences_batch.unsqueeze(1)
         sentences_batch = F.tanh(self.conv(sentences_batch)).squeeze(3)
         sentences_batch = F.max_pool1d(sentences_batch, sentences_batch.size(2)).squeeze(2)
+        sentences_batch = Variable(sentences_batch)
         sentences_batch = torch.cat(sentences_batch, 1)
         sentences_batch = self.fc(sentences_batch)
         return sentences_batch        
@@ -47,9 +48,9 @@ class CNN_clsm(nn.Module):
             return the similarity in sementic layer
         '''
         query   = self.embedding(query)
-        query   = Variable(query)
+        # query   = Variable(query)
         doc     = self.embedding(doc)
-        doc     = Variable(doc)
+        # doc     = Variable(doc)
         query   = self.conv_and_pool(query)
         doc     = self.conv_and_pool(doc)
         gamma   = Variable(torch.FloatTensor(0.1)) # smoothing factor
