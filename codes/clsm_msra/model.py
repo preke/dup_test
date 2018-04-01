@@ -52,8 +52,8 @@ class CNN_clsm(nn.Module):
         # doc     = Variable(doc)
         query   = self.conv_and_pool(query)
         doc     = self.conv_and_pool(doc)
-        gamma   = Variable(torch.FloatTensor(0.1)) # smoothing factor
-        gamma   = gamma.cuda() if self.args.cuda else gamma
+        gamma   = 0.1 # Variable(torch.FloatTensor()) # smoothing factor
+        # gamma   = gamma.cuda() if self.args.cuda else gamma
         cos_sim = gamma * F.cosine_similarity(query, doc)
         return cos_sim
         
