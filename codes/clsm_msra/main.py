@@ -62,13 +62,13 @@ if args.cuda:
 
 # train_data = pd.read_csv(Train_path, encoding='gb18030', header=None)
 
-query    = data.Field(sequential=True, use_vocab=False, batch_first=True)
-pos_doc  = data.Field(sequential=True, use_vocab=False, batch_first=True)
-neg_doc1 = data.Field(sequential=True, use_vocab=False, batch_first=True)
-neg_doc2 = data.Field(sequential=True, use_vocab=False, batch_first=True)
-neg_doc3 = data.Field(sequential=True, use_vocab=False, batch_first=True)
-neg_doc4 = data.Field(sequential=True, use_vocab=False, batch_first=True)
-neg_doc5 = data.Field(sequential=True, use_vocab=False, batch_first=True)
+query    = data.Field(sequential=False, use_vocab=False, batch_first=True)
+pos_doc  = data.Field(sequential=False, use_vocab=False, batch_first=True)
+neg_doc1 = data.Field(sequential=False, use_vocab=False, batch_first=True)
+neg_doc2 = data.Field(sequential=False, use_vocab=False, batch_first=True)
+neg_doc3 = data.Field(sequential=False, use_vocab=False, batch_first=True)
+neg_doc4 = data.Field(sequential=False, use_vocab=False, batch_first=True)
+neg_doc5 = data.Field(sequential=False, use_vocab=False, batch_first=True)
 
 train_data = data.TabularDataset(
                                 path=Train_path, 
