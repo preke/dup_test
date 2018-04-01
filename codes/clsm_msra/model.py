@@ -37,8 +37,7 @@ class CNN_clsm(nn.Module):
         sentences_batch = sentences_batch.unsqueeze(1)
         sentences_batch = F.tanh(self.conv(sentences_batch)).squeeze(3)
         sentences_batch = F.max_pool1d(sentences_batch, sentences_batch.size(2)).squeeze(2)
-        sentences_batch = Variable(sentences_batch)
-        sentences_batch = torch.cat(sentences_batch, 1)
+        # sentences_batch = torch.cat(sentences_batch, 1)
         sentences_batch = self.fc(sentences_batch)
         return sentences_batch        
 
