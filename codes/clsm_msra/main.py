@@ -73,7 +73,7 @@ train_iter= data.Iterator(train_data,
 word_vec_list = []
 for idx, word in enumerate(TEXT.vocab.itos):
     if word in embedding_dict:
-        vector = embedding_dict[word]
+        vector = np.array(embedding_dict[word]).reshape(1, embedding_length)
     else:
         vector = np.random.rand(1, args.embedding_length)
     word_vec_list.append(torch.from_numpy(vector))
