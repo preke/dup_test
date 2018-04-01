@@ -17,19 +17,19 @@ def train(train_iter, vali_iter, model, args):
     for epoch in range(1, args.epochs+1):
         print('Epoch:%s\n'%epoch)
         for batch in train_iter:
-            query, pos_doc, neg_doc1, neg_doc2, neg_doc3, neg_doc4, neg_doc5 = \
-            batch.query, batch.pos_doc, batch.neg_doc1, batch.neg_doc2, batch.neg_doc3, batch.neg_doc4, batch.neg_doc5
-            query.t_(), pos_doc.t_(), neg_doc1.t_(), neg_doc2.t_(), neg_doc3.t_(), neg_doc4.t_(), neg_doc5.t_()
+            query, pos_doc, neg_doc_1, neg_doc_2, neg_doc_3, neg_doc_4, neg_doc_5 = \
+            batch.query, batch.pos_doc, batch.neg_doc_1, batch.neg_doc_2, batch.neg_doc_3, batch.neg_doc_4, batch.neg_doc_5
+            query.t_(), pos_doc.t_(), neg_doc_1.t_(), neg_doc_2.t_(), neg_doc_3.t_(), neg_doc_4.t_(), neg_doc_5.t_()
             if args.cuda:
-                query, pos_doc, neg_doc1, neg_doc2, neg_doc3, neg_doc4, neg_doc5 = \
-                query.cuda(), pos_doc.cuda(), neg_doc1.cuda(), neg_doc2.cuda(), neg_doc3.cuda(), neg_doc4.cuda(), neg_doc5.cuda()
+                query, pos_doc, neg_doc_1, neg_doc_2, neg_doc_3, neg_doc_4, neg_doc_5 = \
+                query.cuda(), pos_doc.cuda(), neg_doc_1.cuda(), neg_doc_2.cuda(), neg_doc_3.cuda(), neg_doc_4.cuda(), neg_doc_5.cuda()
             
             optimizer.zero_grad()
-            results = torch.cat([model(query, pos_doc), model(query, neg_doc1)])
-            results = torch.cat([results, model(query, neg_doc2)])
-            results = torch.cat([results, model(query, neg_doc3)])
-            results = torch.cat([results, model(query, neg_doc4)])
-            results = torch.cat([results, model(query, neg_doc5)])
+            results = torch.cat([model(query, pos_doc), model(query, neg_doc_1)])
+            results = torch.cat([results, model(query, neg_doc_2)])
+            results = torch.cat([results, model(query, neg_doc_3)])
+            results = torch.cat([results, model(query, neg_doc_4)])
+            results = torch.cat([results, model(query, neg_doc_5)])
 
             criterion = nn.NLLLoss()
             loss = criterion(nn.LogSoftmax(results[0]))
