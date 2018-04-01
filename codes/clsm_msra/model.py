@@ -26,7 +26,7 @@ class CNN_clsm(nn.Module):
         self.dropout = nn.Dropout(args.dropout, self.training)
         self.fc      = nn.Linear(in_features=Co, out_features=Ss)
 
-    def conv_and_pool(sentences_batch):
+    def conv_and_pool(self, sentences_batch):
         '''
             The input is a word_hashed sentences matrix.
             N    : Batch size
@@ -37,6 +37,7 @@ class CNN_clsm(nn.Module):
         sentences_batch = sentences_batch.unsqueeze(1)
         sentences_batch = F.tanh(self.conv(sentences_batch)).squeeze(3)
         sentences_batch = F.max_pool1d(sentences_batch, sentences_batch.size(2)).squeeze(2)
+        sentences_batch = torch(sentences_batch, 1)
         sentences_batch = self.fc(sentences_batch)
         return sentences_batch        
 
