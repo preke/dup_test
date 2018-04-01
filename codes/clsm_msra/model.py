@@ -47,8 +47,9 @@ class CNN_clsm(nn.Module):
             return the similarity in sementic layer
         '''
         query   = self.embedding(query)
+        query   = Variable(query)
         doc     = self.embedding(doc)
-        
+        doc     = Variable(doc)
         query   = self.conv_and_pool(query)
         doc     = self.conv_and_pool(doc)
         gamma   = Variable(torch.FloatTensor(0.1)) # smoothing factor
