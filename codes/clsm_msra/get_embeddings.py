@@ -29,9 +29,11 @@ def get_embeddings_and_split_datasets(data_path, prefix, neg_num=5):
                 if dup.startswith(prefix):
                     tmp_list.append(dup)
                     for j in range(neg_num):
-                        tmp = np.random.choice(df['Issue_id'].values)
-                        if (tmp != r['Issue_id']) and (tmp != dup): 
-                            tmp_list.append(tmp)
+                        while True:
+                            tmp = np.random.choice(df['Issue_id'].values)
+                            if (tmp != r['Issue_id']) and (tmp != dup): 
+                                tmp_list.append(tmp)
+                                break
                     data_set_index.append([r['Issue_id'], tmp_list])
 
     data_set_index = pd.DataFrame(data_set_index, columns=['query', 'doc_list'])
