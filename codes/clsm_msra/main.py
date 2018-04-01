@@ -16,6 +16,8 @@ from load_data import load_data
 from train import train
 import sys
 import csv
+from get_embeddings import get_embeddings_and_split_datasets
+
 csv.field_size_limit(sys.maxsize)
 
 Data_path = '../../data/spark.csv'
