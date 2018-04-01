@@ -20,6 +20,7 @@ csv.field_size_limit(sys.maxsize)
 
 Data_path = '../../data/spark.csv'
 Train_path = './datas/train_set.csv'
+Test_path = './datas/test_set.csv'
 
 parser = argparse.ArgumentParser(description='')
 # learning
@@ -42,54 +43,47 @@ parser.add_argument('-kernel-size', type=str, default=3, help='comma-separated k
 # device
 parser.add_argument('-device', type=int, default=0, help='device to use for iterate data, -1 mean cpu [default: -1]')
 parser.add_argument('-no-cuda', action='store_true', default=False, help='disable the gpu')
+
 args = parser.parse_args()
 
+args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 args.sementic_size = 128    
+embedding_dict, embedding_length = get_embeddings_and_split_datasets(Data_path, 'SPARK')
 
-if os.path.exists(Train_path):
-    args.tri_letter_length = 15419    
-else:
-    print('Loading data begin.')
-    args.tri_letter_length = load_data(data_path=Data_path, prefix='SPARK', neg_num=5)
-    print(args.tri_letter_length)
-    print('Loading data done.')
 
-cnn = CNN_clsm(args)
+TEXT = data.Field(sequential=True, use_vocab=True, batch_first=True)
+train_data = data.TabularDataset( path=Train_path, 
+                                  format='CSV',
+                                  fields=[('query', TEXT), ('pos_doc', TEXT), ('neg_doc_1', TEXT), 
+                                        ('neg_doc_2', TEXT), ('neg_doc_3', TEXT), ('neg_doc_4', TEXT),
+                                        ('neg_doc_5', TEXT) ])
+TEXT.build_vocab(train_data)
+
+args.embedding_length = embedding_length
+args.embedding_num = len(TEXT.vocab)
+
+train_iter= data.Iterator(train_data,
+                          batch_size=args.batch_size,
+                          device=-1, 
+                          repeat=False)
+
+
+word_vec_list = []
+for idx, word in enumerate(TEXT.vocab.itos):
+    if word in embedding_dict:
+        vector = embedding_dict[word]
+    else:
+        vector = np.random.rand(1, args.embedding_length)
+    word_vec_list.append(torch.from_numpy(vector))
+wordvec_matrix = torch.cat(word_vec_list)
+    
+cnn = CNN_clsm(args, wordvec_matrix)
 args.cuda = (not args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
 if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
 
-# train_data = pd.read_csv(Train_path, encoding='gb18030', header=None)
 
-query    = data.Field(sequential=False, use_vocab=False, batch_first=True)
-pos_doc  = data.Field(sequential=False, use_vocab=False, batch_first=True)
-neg_doc1 = data.Field(sequential=False, use_vocab=False, batch_first=True)
-neg_doc2 = data.Field(sequential=False, use_vocab=False, batch_first=True)
-neg_doc3 = data.Field(sequential=False, use_vocab=False, batch_first=True)
-neg_doc4 = data.Field(sequential=False, use_vocab=False, batch_first=True)
-neg_doc5 = data.Field(sequential=False, use_vocab=False, batch_first=True)
-
-train_data = data.TabularDataset(
-                                path=Train_path, 
-                                format='CSV',
-                                fields=[('query_hashing_list', query), 
-                                        ('pos_doc', pos_doc),
-                                        ('neg_doc_1', neg_doc1),
-                                        ('neg_doc_2', neg_doc2),
-                                        ('neg_doc_3', neg_doc3),
-                                        ('neg_doc_4', neg_doc4),
-                                        ('neg_doc_5', neg_doc5)
-                                        ])
-
-train_iter= data.Iterator(
-                            train_data,
-                            batch_size=args.batch_size,
-                            device=-1, 
-                            repeat=False)
-
-
-args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
 
 

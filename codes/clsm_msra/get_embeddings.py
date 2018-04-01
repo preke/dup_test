@@ -13,17 +13,7 @@ import traceback
 from sklearn.utils import shuffle  
 from word_hashing import WordHashing
 
-def load_data(data_path, prefix, neg_num=5):
-    '''
-        生成训练集和测试集
-
-        prefix 为bug问题单的前缀：如 'SPARK-20000' 的 prefix 为 'SPARK'
-        prefix 与数据集相对应
-
-        正样本（标记为重复的pair）
-        负样本（标记为非重复的pair（随机生成））
-        正负样本比 1：neg_num（参数的最后一项）
-    '''
+def get_embeddings_and_split_datasets(data_path, prefix, neg_num=5):
     
     df = pd.read_csv(data_path, encoding = 'gb18030')
     df['Duplicate_null'] = df['Duplicated_issue'].apply(lambda x : pd.isnull(x))
@@ -51,7 +41,6 @@ def load_data(data_path, prefix, neg_num=5):
     data_set['doc_list'] = data_set_index['doc_list'].apply(\
         lambda xs: [(list(df[df['Issue_id'] == x]['Title'])[0] if len(list(df[df['Issue_id'] == x]['Title'])) > 0 else '') for x in xs])
     
-    # lower
     corpus = []
     for i, r in data_set.iterrows():
         corpus += r['query'].split(' ')
@@ -59,25 +48,28 @@ def load_data(data_path, prefix, neg_num=5):
             corpus += doc.split(' ') 
     
     wh_instance = WordHashing(corpus)
-    data_set['query_hashing_list'] = data_set['query'].apply(\
-        lambda x: [wh_instance.hashing(i) for i in x.split(' ')])
-    data_set['docs_hashing_list'] = data_set['doc_list'].apply(\
-        lambda x: [[wh_instance.hashing(i) for i in doc.split(' ')] for doc in x])
-    data_set['pos_doc'] = data_set['docs_hashing_list'].apply(lambda x: x[0])
-    data_set['neg_doc_1'] = data_set['docs_hashing_list'].apply(lambda x: x[1])
-    data_set['neg_doc_2'] = data_set['docs_hashing_list'].apply(lambda x: x[2])
-    data_set['neg_doc_3'] = data_set['docs_hashing_list'].apply(lambda x: x[3])
-    data_set['neg_doc_4'] = data_set['docs_hashing_list'].apply(lambda x: x[4])
-    data_set['neg_doc_5'] = data_set['docs_hashing_list'].apply(lambda x: x[5])
+    embedding_length = 0
+    embedding_dict = {}
+    for word in corpus:
+        embedding_dict[word] = wh_instance.hashing(word)
+        embedding_length     = len(wh_instance.hashing(word))
 
+    data_set['pos_doc']   = data_set['doc_list'].apply(lambda x: x[0])
+    data_set['neg_doc_1'] = data_set['doc_list'].apply(lambda x: x[1])
+    data_set['neg_doc_2'] = data_set['doc_list'].apply(lambda x: x[2])
+    data_set['neg_doc_3'] = data_set['doc_list'].apply(lambda x: x[3])
+    data_set['neg_doc_4'] = data_set['doc_list'].apply(lambda x: x[4])
+    data_set['neg_doc_5'] = data_set['doc_list'].apply(lambda x: x[5])
 
+    data_set = data_set[['query', 'pos_doc', 'neg_doc_1', 'neg_doc_2',
+                        'neg_doc_3', 'neg_doc_4', 'neg_doc_5']]
 
-    data_set = data_set[['query_hashing_list', 'pos_doc', \
-                'neg_doc_1', 'neg_doc_2', 'neg_doc_3', 'neg_doc_4', 'neg_doc_5']]
     ratio = 0.8 # train set ratio
     data_set.head(int(ratio*len(data_set))).to_csv('./datas/train_set.csv', index=False)
     data_set.tail(int((1-ratio)*len(data_set))).to_csv('./datas/test_set.csv', index=False)
+    
+    return embedding_dict, embedding_length
 
-    # the length of tri-letter vectors
-    return len(data_set.ix[0]['query_hashing_list'][0])
 
+
+    

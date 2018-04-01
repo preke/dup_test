@@ -7,16 +7,21 @@ from math import sqrt
 
 class CNN_clsm(nn.Module):
     
-    def __init__(self, args):
+    def __init__(self, args, wordvec_matrix):
         super(CNN_clsm, self).__init__()
         self.args = args
         
         Ci = 1 # Channel in
         Co = args.kernel_num # 300
         K  = args.kernel_size # 3
-        D  = args.tri_letter_length
+        D  = args.embedding_length
         Ss = args.sementic_size
-        
+        V  = args.embedding_num
+
+        self.embedding = nn.embedding(V, D)
+        self.embedding.weight.data.copy_(wordvec_matrix)
+        self.embedding.weight.requires_grad = False
+
         self.conv    = nn.Conv2d(Ci, Co, (K, D))
         self.dropout = nn.Dropout(args.dropout, self.training)
         self.fc      = nn.Linear(in_features=Co, out_features=Ss)
@@ -40,10 +45,13 @@ class CNN_clsm(nn.Module):
             Input a query and doc,
             return the similarity in sementic layer
         '''
-        query     = conv_and_pool(query)
-        doc       = conv_and_pool(doc)
-        gamma     = Variable(torch.FloatTensor(0.1)) # smoothing factor
-        gamma     = gamma.cuda() if self.args.cuda else gamma
-        cos_sim  = gamma * F.cosine_similarity(query, doc)
+        query   = self.embedding(query)
+        doc     = self.embedding(doc)
+        
+        query   = conv_and_pool(query)
+        doc     = conv_and_pool(doc)
+        gamma   = Variable(torch.FloatTensor(0.1)) # smoothing factor
+        gamma   = gamma.cuda() if self.args.cuda else gamma
+        cos_sim = gamma * F.cosine_similarity(query, doc)
         return cos_sim
         
