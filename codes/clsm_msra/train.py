@@ -16,8 +16,10 @@ def train(train_iter, vali_iter, model, args):
     best_acc   = 0
     last_step  = 0
     model.train()
+    log_file = open('log.txt', 'w')
     for epoch in range(1, args.epochs+1):
         print('\nEpoch:%s\n'%epoch)
+        log_file.write('\nEpoch:%s\n'%epoch)
         for batch in train_iter:
             query, pos_doc, neg_doc_1, neg_doc_2, neg_doc_3, neg_doc_4, neg_doc_5 = \
             batch.query, batch.pos_doc, batch.neg_doc_1, batch.neg_doc_2, batch.neg_doc_3, batch.neg_doc_4, batch.neg_doc_5
@@ -47,7 +49,7 @@ def train(train_iter, vali_iter, model, args):
             steps += 1
             if steps % args.log_interval == 0:
                 sys.stdout.write('\rBatch[{}] - loss: {:.6f}'.format(steps, loss.data[0]))
-            
+                log_file.write('\rBatch[{}] - loss: {:.6f}'.format(steps, loss.data[0]))
             if steps % args.test_interval == 0:
                 pass
                 # vali_acc = eval(vali_iter, model, args)
@@ -61,7 +63,10 @@ def train(train_iter, vali_iter, model, args):
                 #         print('early stop by {} steps.'.format(args.early_stop))
             elif steps % args.save_interval == 0:
                 print('save loss: %s' %str(loss.data))
+                log_file.write('save loss: %s\n' %str(loss.data))
                 save(model, args.save_dir, 'snapshot', steps)
+
+    log_file.close()
 
 
 # def eval(data_iter, model, args):
