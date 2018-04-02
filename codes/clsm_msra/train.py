@@ -38,7 +38,6 @@ def train(train_iter, vali_iter, model, args):
             target     = target_tmp
             for i in range(args.batch_size - 1):
                 target = torch.cat([target, target_tmp])
-            target = target.view(-1,1)
             print(target.shape)
             if args.cuda:
                 target = target.cuda()
