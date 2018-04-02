@@ -32,13 +32,11 @@ def train(train_iter, vali_iter, model, args):
             results = torch.cat([results, model(query, neg_doc_3).view(-1,1)], 1)
             results = torch.cat([results, model(query, neg_doc_4).view(-1,1)], 1)
             results = torch.cat([results, model(query, neg_doc_5).view(-1,1)], 1)
-            print(results.shape)
             criterion  = nn.NLLLoss()
             target_tmp = Variable(torch.LongTensor(np.array([0], dtype=float)))
             target     = target_tmp
-            for i in range(args.batch_size - 1):
+            for i in range(results.shape[0] - 1):
                 target = torch.cat([target, target_tmp])
-            print(target.shape)
             if args.cuda:
                 target = target.cuda()
             log_softmax = nn.LogSoftmax(dim = 1)

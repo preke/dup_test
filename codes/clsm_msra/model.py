@@ -46,9 +46,6 @@ class CNN_clsm(nn.Module):
             Input a query and doc,
             return the similarity in sementic layer
         '''
-        print('Input Query shape: %s' %str(query.shape))
-        print('Input Doc shape: %s' %str(doc.shape))
-        print('\n')
         query   = self.embedding(query)
         # query   = Variable(query)
         doc     = self.embedding(doc)
