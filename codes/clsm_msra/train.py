@@ -40,7 +40,7 @@ def train(train_iter, vali_iter, model, args):
                 target = torch.cat([target, target_tmp, 1])
             print(target.shape)
             print(results.shape)
-            loss = criterion(nn.LogSoftmax(results), target)
+            loss = criterion(results, target)
             loss.backward()
             optimizer.step()
 
