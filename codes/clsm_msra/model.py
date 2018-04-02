@@ -35,15 +35,10 @@ class CNN_clsm(nn.Module):
             K    : kernel size
         '''
         sentences_batch = sentences_batch.unsqueeze(1)
-        print(sentences_batch.shape)
         sentences_batch = F.tanh(self.conv(sentences_batch)).squeeze(3)
-        print(sentences_batch.shape)
         sentences_batch = F.max_pool1d(sentences_batch, sentences_batch.size(2)).squeeze(2)
-        print(sentences_batch.shape)
         # sentences_batch = torch.cat(sentences_batch, 1)
         sentences_batch = self.fc(sentences_batch)
-        print(sentences_batch.shape)
-        print('\n')
         return sentences_batch        
 
     def forward(self, query, doc):
