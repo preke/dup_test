@@ -61,6 +61,6 @@ class CNN_clsm(nn.Module):
         print(doc.shape)
         cos_sim = gamma * F.cosine_similarity(query, doc)
         result = nn.LogSoftmax(cos_sim)
-        print('result: %s' %str(result.shape))
+        print(result)
         return result
         
