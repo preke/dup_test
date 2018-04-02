@@ -11,10 +11,10 @@ def train(train_iter, vali_iter, model, args):
     if args.cuda:
         model.cuda()
     parameters = list(filter(lambda p: p.requires_grad, model.parameters()))    
-    optimizer = torch.optim.Adam(parameters, lr=args.lr)
-    steps = 0
-    best_acc = 0
-    last_step = 0
+    optimizer  = torch.optim.Adam(parameters, lr=args.lr)
+    steps      = 0
+    best_acc   = 0
+    last_step  = 0
     model.train()
     for epoch in range(1, args.epochs+1):
         print('Epoch:%s\n'%epoch)
@@ -34,9 +34,9 @@ def train(train_iter, vali_iter, model, args):
             results = torch.cat([results, model(query, neg_doc_4), 1])
             results = torch.cat([results, model(query, neg_doc_5), 1])
 
-            criterion = nn.NLLLoss()
+            criterion  = nn.NLLLoss()
             target_tmp = Variable(torch.FloatTensor(np.array([1, 0,0,0,0,0], dtype=float).reshape(6,1)))
-            target = target_tmp
+            target     = target_tmp
             for i in range(args.batch_size - 1):
                 target = torch.cat([target, target_tmp, 1])
             print(target.shape)
