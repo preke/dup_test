@@ -60,16 +60,19 @@ train_data = data.TabularDataset( path=Train_path,
                                   fields=[('query', TEXT), ('pos_doc', TEXT), ('neg_doc_1', TEXT), 
                                         ('neg_doc_2', TEXT), ('neg_doc_3', TEXT), ('neg_doc_4', TEXT),
                                         ('neg_doc_5', TEXT) ])
-TEXT.build_vocab(train_data)
 
+# train_data, vali_data = train_data.splits(split_ratio=0.9)
+
+TEXT.build_vocab(train_data)
 args.embedding_length = embedding_length
 args.embedding_num = len(TEXT.vocab)
-
 train_iter= data.Iterator(train_data,
                           batch_size=args.batch_size,
                           device=-1, 
                           repeat=False)
-
+# train_iter, vali_iter = data.Iterator.splits(
+#                             (train_data, vali_data), 
+#                             batch_sizes=(args.batch_size, len(vali_data)),device=-1, repeat=False)
 
 word_vec_list = []
 for idx, word in enumerate(TEXT.vocab.itos):
