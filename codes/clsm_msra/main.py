@@ -68,6 +68,7 @@ train_data = data.TabularDataset( path=Train_path,
 #     (train_data, vali_data), 
 #     batch_sizes=(args.batch_size, len(vali_data)), 
 #     repeat=False)
+
 ''''''
 
 TEXT.build_vocab(train_data)
@@ -75,6 +76,7 @@ args.embedding_length = embedding_length
 args.embedding_num = len(TEXT.vocab)
 train_iter= data.Iterator(train_data,
                           batch_size=args.batch_size,
+                          device=-1,
                           repeat=False)
 
 

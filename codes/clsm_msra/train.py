@@ -17,7 +17,7 @@ def train(train_iter, vali_iter, model, args):
     last_step  = 0
     model.train()
     for epoch in range(1, args.epochs+1):
-        print('Epoch:%s\n'%epoch)
+        print('\nEpoch:%s\n'%epoch)
         for batch in train_iter:
             query, pos_doc, neg_doc_1, neg_doc_2, neg_doc_3, neg_doc_4, neg_doc_5 = \
             batch.query, batch.pos_doc, batch.neg_doc_1, batch.neg_doc_2, batch.neg_doc_3, batch.neg_doc_4, batch.neg_doc_5
