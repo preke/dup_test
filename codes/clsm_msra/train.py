@@ -37,7 +37,7 @@ def train(train_iter, vali_iter, model, args):
             target_tmp = Variable(torch.FloatTensor(np.array([1, 0,0,0,0,0], dtype=float).reshape(1,6)))
             target = target_tmp
             for i in range(args.batch_size - 1):
-                target = target.cat(target_tmp)
+                target = torch.cat([target, target_tmp])
             print(target.shape)
             print(results.shape)
             loss = criterion(nn.LogSoftmax(results), target)
