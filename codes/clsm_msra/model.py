@@ -59,7 +59,7 @@ class CNN_clsm(nn.Module):
         # gamma   = gamma.cuda() if self.args.cuda else gamma
         print(query.shape)
         print(doc.shape)
-        cos_sim = gamma * F.cosine_similarity(query, doc)
+        cos_sim = F.cosine_similarity(query, doc)
         print('TTTTT')
         print(cos_sim)
         result = nn.LogSoftmax(cos_sim)
