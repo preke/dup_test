@@ -37,7 +37,7 @@ def train(train_iter, vali_iter, model, args):
             target_tmp = Variable(torch.FloatTensor(np.array([1, 0,0,0,0,0], dtype=float).reshape(6,1)))
             target     = target_tmp
             for i in range(args.batch_size - 1):
-                target = torch.cat([target, target_tmp, 1])
+                target = torch.cat([target, target_tmp1], 1)
             print(target.shape)
             
             loss = criterion(results, target)
