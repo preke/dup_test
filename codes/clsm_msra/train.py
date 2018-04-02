@@ -19,7 +19,7 @@ def train(train_iter, vali_iter, model, args):
         for batch in train_iter:
             query, pos_doc, neg_doc_1, neg_doc_2, neg_doc_3, neg_doc_4, neg_doc_5 = \
             batch.query, batch.pos_doc, batch.neg_doc_1, batch.neg_doc_2, batch.neg_doc_3, batch.neg_doc_4, batch.neg_doc_5
-            query.t_(), pos_doc.t_(), neg_doc_1.t_(), neg_doc_2.t_(), neg_doc_3.t_(), neg_doc_4.t_(), neg_doc_5.t_()
+            # query.t_(), pos_doc.t_(), neg_doc_1.t_(), neg_doc_2.t_(), neg_doc_3.t_(), neg_doc_4.t_(), neg_doc_5.t_()
             if args.cuda:
                 query, pos_doc, neg_doc_1, neg_doc_2, neg_doc_3, neg_doc_4, neg_doc_5 = \
                 query.cuda(), pos_doc.cuda(), neg_doc_1.cuda(), neg_doc_2.cuda(), neg_doc_3.cuda(), neg_doc_4.cuda(), neg_doc_5.cuda()
