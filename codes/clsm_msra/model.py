@@ -60,5 +60,6 @@ class CNN_clsm(nn.Module):
         print(query.shape)
         print(doc.shape)
         cos_sim = gamma * F.cosine_similarity(query, doc)
+        print('Cos: %s' %str(cos_sim.shape))
         return cos_sim
         

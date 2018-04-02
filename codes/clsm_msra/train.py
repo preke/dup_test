@@ -27,7 +27,6 @@ def train(train_iter, vali_iter, model, args):
                 query.cuda(), pos_doc.cuda(), neg_doc_1.cuda(), neg_doc_2.cuda(), neg_doc_3.cuda(), neg_doc_4.cuda(), neg_doc_5.cuda()
             
             optimizer.zero_grad()
-            print(model(query, pos_doc).shape)
             results = torch.cat([model(query, pos_doc), model(query, neg_doc_1), 1])
             results = torch.cat([results, model(query, neg_doc_2), 1])
             results = torch.cat([results, model(query, neg_doc_3), 1])
