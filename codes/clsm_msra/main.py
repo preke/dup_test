@@ -10,6 +10,7 @@ import os
 import datetime
 import traceback
 
+
 from word_hashing import WordHashing
 from model import CNN_clsm
 from load_data import load_data

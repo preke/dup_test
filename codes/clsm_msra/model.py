@@ -35,10 +35,15 @@ class CNN_clsm(nn.Module):
             K    : kernel size
         '''
         sentences_batch = sentences_batch.unsqueeze(1)
+        print(sentences_batch.shape)
         sentences_batch = F.tanh(self.conv(sentences_batch)).squeeze(3)
+        print(sentences_batch.shape)
         sentences_batch = F.max_pool1d(sentences_batch, sentences_batch.size(2)).squeeze(2)
+        print(sentences_batch.shape)
         # sentences_batch = torch.cat(sentences_batch, 1)
         sentences_batch = self.fc(sentences_batch)
+        print(sentences_batch.shape)
+        print('\n')
         return sentences_batch        
 
     def forward(self, query, doc):
@@ -46,6 +51,9 @@ class CNN_clsm(nn.Module):
             Input a query and doc,
             return the similarity in sementic layer
         '''
+        print('Input Query shape: %s' %str(query.shape))
+        print('Input Doc shape: %s' %str(doc.shape))
+        print('\n')
         query   = self.embedding(query)
         # query   = Variable(query)
         doc     = self.embedding(doc)
