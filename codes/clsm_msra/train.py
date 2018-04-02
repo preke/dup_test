@@ -34,7 +34,8 @@ def train(train_iter, vali_iter, model, args):
             results = torch.cat([results, model(query, neg_doc_5)])
 
             criterion = nn.NLLLoss()
-            target = Variable(torch.FloatTensor(np.array([1, 0,0,0,0,0], dtype=float).reshape(1,6)))
+            target = Variable(torch.FloatTensor(np.array([1, 0,0,0,0,0], dtype=float).reshape(1,6)*64))
+            print(target.shape)
             print(results.shape)
             loss = criterion(nn.LogSoftmax(results), target)
             loss.backward()
