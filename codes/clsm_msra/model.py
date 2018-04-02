@@ -57,12 +57,6 @@ class CNN_clsm(nn.Module):
         doc     = self.conv_and_pool(doc)
         gamma   = 0.1 # Variable(torch.FloatTensor()) # smoothing factor
         # gamma   = gamma.cuda() if self.args.cuda else gamma
-        print(query.shape)
-        print(doc.shape)
-        cos_sim = F.cosine_similarity(query, doc)
-        print('TTTTT')
-        print(cos_sim)
-        result = nn.LogSoftmax(cos_sim)
-        print(result)
-        return result
+        cos_sim = gamma * F.cosine_similarity(query, doc)
+        return cos_sim
         

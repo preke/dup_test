@@ -27,19 +27,19 @@ def train(train_iter, vali_iter, model, args):
                 query.cuda(), pos_doc.cuda(), neg_doc_1.cuda(), neg_doc_2.cuda(), neg_doc_3.cuda(), neg_doc_4.cuda(), neg_doc_5.cuda()
             
             optimizer.zero_grad()
-            results = torch.cat([model(query, pos_doc), model(query, neg_doc_1), 1])
-            results = torch.cat([results, model(query, neg_doc_2), 1])
-            results = torch.cat([results, model(query, neg_doc_3), 1])
-            results = torch.cat([results, model(query, neg_doc_4), 1])
-            results = torch.cat([results, model(query, neg_doc_5), 1])
-
+            results = torch.cat([model(query, pos_doc).view(-1,1), model(query, neg_doc_1).view(-1,1), 1])
+            results = torch.cat([results, model(query, neg_doc_2).view(-1,1), 1])
+            results = torch.cat([results, model(query, neg_doc_3).view(-1,1), 1])
+            results = torch.cat([results, model(query, neg_doc_4).view(-1,1), 1])
+            results = torch.cat([results, model(query, neg_doc_5).view(-1,1), 1])
+            print(results.shape)
             criterion  = nn.NLLLoss()
             target_tmp = Variable(torch.FloatTensor(np.array([1, 0,0,0,0,0], dtype=float).reshape(6,1)))
             target     = target_tmp
             for i in range(args.batch_size - 1):
                 target = torch.cat([target, target_tmp, 1])
             print(target.shape)
-            print(results.shape)
+            
             loss = criterion(results, target)
             loss.backward()
             optimizer.step()
