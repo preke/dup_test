@@ -35,6 +35,7 @@ def train(train_iter, vali_iter, model, args):
 
             criterion = nn.NLLLoss()
             target = Variable(torch.FloatTensor(np.array([1, 0,0,0,0,0], dtype=float).reshape(1,6)))
+            print(results.shape)
             loss = criterion(nn.LogSoftmax(results), target)
             loss.backward()
             optimizer.step()
