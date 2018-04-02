@@ -34,12 +34,13 @@ def train(train_iter, vali_iter, model, args):
             results = torch.cat([results, model(query, neg_doc_5).view(-1,1)], 1)
             print(results.shape)
             criterion  = nn.NLLLoss()
-            target_tmp = Variable(torch.FloatTensor(np.array([1, 0,0,0,0,0], dtype=float).reshape(6,1)))
+            target_tmp = Variable(torch.FloatTensor(np.array([1, 0,0,0,0,0], dtype=float).reshape(1,6)))
             target     = target_tmp
             for i in range(args.batch_size - 1):
-                target = torch.cat([target, target_tmp], 1)
+                target = torch.cat([target, target_tmp])
             print(target.shape)
-            
+            if args.cuda:
+                target = target.cuda()
             loss = criterion(results, target)
             loss.backward()
             optimizer.step()
