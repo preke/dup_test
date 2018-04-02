@@ -61,7 +61,10 @@ train_data = data.TabularDataset( path=Train_path,
                                         ('neg_doc_2', TEXT), ('neg_doc_3', TEXT), ('neg_doc_4', TEXT),
                                         ('neg_doc_5', TEXT) ])
 
-# train_data, vali_data = train_data.splits(split_ratio=0.9)
+''''''
+train_data, vali_data = train_data.splits(split_ratio=0.9)
+TEXT.build_vocab(train_data)
+''''''
 
 TEXT.build_vocab(train_data)
 args.embedding_length = embedding_length

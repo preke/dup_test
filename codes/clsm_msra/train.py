@@ -41,7 +41,8 @@ def train(train_iter, vali_iter, model, args):
             print(target.shape)
             if args.cuda:
                 target = target.cuda()
-            loss = criterion(results, target)
+            log_softmax = nn.LogSoftmax(dim = 1)
+            loss = criterion(log_softmax(results), target)
             loss.backward()
             optimizer.step()
 
