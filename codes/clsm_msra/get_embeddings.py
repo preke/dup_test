@@ -49,6 +49,7 @@ def get_embeddings_and_split_datasets(data_path, prefix, neg_num=5):
         for doc in r['doc_list']:
             corpus += doc.split(' ') 
     
+    
     wh_instance = WordHashing(corpus)
     embedding_length = 0
     embedding_dict = {}

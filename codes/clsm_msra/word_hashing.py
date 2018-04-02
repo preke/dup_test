@@ -30,6 +30,12 @@ class WordHashing(object):
             trigram_list = self.trigram(word)
             for trigram in trigram_list:
                 self.trigram_dict[trigram] += 1
+
+        # min count
+        for k, v in self.trigram_dict.items():
+            if v < 5:
+                del self.trigram_dict[k]
+
         self.dict_len = len(self.trigram_dict)
         
         # convert all dict-values into indexs
@@ -46,6 +52,9 @@ class WordHashing(object):
         trigram_list = self.trigram(word)
         ans_vec = [0] * self.dict_len
         for trigram in trigram_list:
-            ans_vec[ self.trigram_dict[trigram] ] += 1
+            try:
+                ans_vec[ self.trigram_dict[trigram] ] += 1
+            except:
+                pass
         return ans_vec
 

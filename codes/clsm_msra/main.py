@@ -52,7 +52,7 @@ args = parser.parse_args()
 args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 args.sementic_size = 128    
 embedding_dict, embedding_length = get_embeddings_and_split_datasets(Data_path, 'SPARK')
-
+print('Embedding done. vector length: %s.\n' %str(embedding_length))
 
 TEXT = data.Field(sequential=True, use_vocab=True, batch_first=True)
 train_data = data.TabularDataset( path=Train_path, 
@@ -71,7 +71,7 @@ train_data = data.TabularDataset( path=Train_path,
 
 ''''''
 
-TEXT.build_vocab(train_data,  min_freq=5)
+TEXT.build_vocab(train_data)
 args.embedding_length = embedding_length
 args.embedding_num = len(TEXT.vocab)
 train_iter= data.Iterator(train_data,
