@@ -71,12 +71,12 @@ train_data = data.TabularDataset( path=Train_path,
 
 ''''''
 
-TEXT.build_vocab(train_data)
+TEXT.build_vocab(train_data,  min_freq=5)
 args.embedding_length = embedding_length
 args.embedding_num = len(TEXT.vocab)
 train_iter= data.Iterator(train_data,
                           batch_size=args.batch_size,
-                          device=-1,
+                          device=0,
                           repeat=False)
 
 
@@ -95,7 +95,9 @@ if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
 
-
+''''''
+# train(train_iter=train_iter, vali_iter=vali_iter, model=cnn, args=args)
+''''''
 train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
 
 
