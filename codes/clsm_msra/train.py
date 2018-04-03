@@ -76,7 +76,7 @@ def save(model, save_dir, save_prefix, steps):
 def eval(vali_iter, model, args):
     model.eval()
     accuracy, avg_loss = 0, 0
-    for batch in data_iter:
+    for batch in vali_iter:
         query, pos_doc, neg_doc_1, neg_doc_2, neg_doc_3, neg_doc_4, neg_doc_5 = \
             batch.query, batch.pos_doc, batch.neg_doc_1, batch.neg_doc_2, batch.neg_doc_3, batch.neg_doc_4, batch.neg_doc_5
         if args.cuda:
