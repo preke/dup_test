@@ -32,7 +32,7 @@ parser.add_argument('-epochs', type=int, default=256, help='number of epochs for
 parser.add_argument('-batch-size', type=int, default=64, help='batch size for training [default: 64]')
 parser.add_argument('-log-interval',  type=int, default=1,   help='how many steps to wait before logging training status [default: 1]')
 parser.add_argument('-test-interval', type=int, default=100, help='how many steps to wait before testing [default: 100]')
-parser.add_argument('-save-interval', type=int, default=10, help='how many steps to wait before saving [default:500]')
+parser.add_argument('-save-interval', type=int, default=500, help='how many steps to wait before saving [default:500]')
 parser.add_argument('-save-dir', type=str, default='snapshot', help='where to save the snapshot')
 parser.add_argument('-early-stop', type=int, default=1000, help='iteration numbers to stop without performance increasing')
 parser.add_argument('-save-best', type=bool, default=True, help='whether to save when get best performance')
@@ -61,25 +61,24 @@ train_data = data.TabularDataset(path=Train_path,
                                         ('neg_doc_2', TEXT), ('neg_doc_3', TEXT), ('neg_doc_4', TEXT),
                                         ('neg_doc_5', TEXT) ])
 
-''''''
-# train_data, vali_data = train_data.splits(split_ratio=0.9)
-# TEXT.build_vocab(train_data, vali_data)
-# train_iter, vali_iter = data.Iterator.splits(
-#     (train_data, vali_data), 
-#     batch_sizes=(args.batch_size, len(vali_data)), 
-#     repeat=False)
-''''''
 
-TEXT.build_vocab(train_data)
-print('Building vocabulary done. Vector length: %s.\n' %str(len(train_data)))
+train_data, vali_data = train_data.splits(split_ratio=0.9)
+TEXT.build_vocab(train_data, vali_data)
+
+# TEXT.build_vocab(train_data)
+# train_iter = data.Iterator(train_data,
+#                           batch_size=args.batch_size,
+#                           device=0,
+#                           repeat=False)
+
+train_iter, vali_iter = data.Iterator.splits(
+    (train_data, vali_data), 
+    batch_sizes=(args.batch_size, len(vali_data)), 
+    repeat=False)
+print('Building vocabulary done. vocabulary length: %s.\n' %str(len(train_data)))
 args.embedding_length = embedding_length
 args.embedding_num    = len(TEXT.vocab)
 
-
-train_iter = data.Iterator(train_data,
-                          batch_size=args.batch_size,
-                          device=0,
-                          repeat=False)
 
 
 word_vec_list = []
@@ -98,9 +97,8 @@ if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
 
-''''''
-# train(train_iter=train_iter, vali_iter=vali_iter, model=cnn, args=args)
-''''''
-train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
+
+train(train_iter=train_iter, vali_iter=vali_iter, model=cnn, args=args)
+# train(train_iter=train_iter, vali_iter=None, model=cnn, args=args)
 
 
