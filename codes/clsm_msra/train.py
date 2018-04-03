@@ -68,7 +68,13 @@ def train(train_iter, vali_iter, model, args):
 
     log_file.close()
 
-
+def save(model, save_dir, save_prefix, steps):
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir)
+    save_prefix = os.path.join(save_dir, save_prefix)
+    save_path = '{}_steps_{}.pt'.format(save_prefix, steps)
+    torch.save(model.state_dict(), save_path)
+    
 # def eval(data_iter, model, args):
 #     model.eval()
 #     accuracy, avg_loss = 0, 0
