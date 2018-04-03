@@ -21,9 +21,9 @@ from get_embeddings import get_embeddings_and_split_datasets
 
 csv.field_size_limit(sys.maxsize)
 
-Data_path = '../../data/spark.csv'
+Data_path  = '../../data/spark.csv'
 Train_path = './datas/train_set.csv'
-Test_path = './datas/test_set.csv'
+Test_path  = './datas/test_set.csv'
 
 parser = argparse.ArgumentParser(description='')
 # learning
@@ -32,7 +32,7 @@ parser.add_argument('-epochs', type=int, default=256, help='number of epochs for
 parser.add_argument('-batch-size', type=int, default=64, help='batch size for training [default: 64]')
 parser.add_argument('-log-interval',  type=int, default=1,   help='how many steps to wait before logging training status [default: 1]')
 parser.add_argument('-test-interval', type=int, default=100, help='how many steps to wait before testing [default: 100]')
-parser.add_argument('-save-interval', type=int, default=500, help='how many steps to wait before saving [default:500]')
+parser.add_argument('-save-interval', type=int, default=10, help='how many steps to wait before saving [default:500]')
 parser.add_argument('-save-dir', type=str, default='snapshot', help='where to save the snapshot')
 parser.add_argument('-early-stop', type=int, default=1000, help='iteration numbers to stop without performance increasing')
 parser.add_argument('-save-best', type=bool, default=True, help='whether to save when get best performance')
@@ -52,12 +52,12 @@ args = parser.parse_args()
 args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 args.sementic_size = 128    
 embedding_dict, embedding_length = get_embeddings_and_split_datasets(Data_path, 'SPARK')
-print('Embedding done. vector length: %s.\n' %str(embedding_length))
+print('Embedding done. Vector length: %s.\n' %str(embedding_length))
 
 TEXT = data.Field(sequential=True, use_vocab=True, batch_first=True)
-train_data = data.TabularDataset( path=Train_path, 
-                                  format='CSV',
-                                  fields=[('query', TEXT), ('pos_doc', TEXT), ('neg_doc_1', TEXT), 
+train_data = data.TabularDataset(path=Train_path, 
+                                 format='CSV',
+                                 fields=[('query', TEXT), ('pos_doc', TEXT), ('neg_doc_1', TEXT), 
                                         ('neg_doc_2', TEXT), ('neg_doc_3', TEXT), ('neg_doc_4', TEXT),
                                         ('neg_doc_5', TEXT) ])
 
@@ -68,13 +68,15 @@ train_data = data.TabularDataset( path=Train_path,
 #     (train_data, vali_data), 
 #     batch_sizes=(args.batch_size, len(vali_data)), 
 #     repeat=False)
-
 ''''''
 
 TEXT.build_vocab(train_data)
+print('Building vocabulary done. Vector length: %s.\n' %str(len(train_data)))
 args.embedding_length = embedding_length
-args.embedding_num = len(TEXT.vocab)
-train_iter= data.Iterator(train_data,
+args.embedding_num    = len(TEXT.vocab)
+
+
+train_iter = data.Iterator(train_data,
                           batch_size=args.batch_size,
                           device=0,
                           repeat=False)
@@ -89,8 +91,9 @@ for idx, word in enumerate(TEXT.vocab.itos):
     word_vec_list.append(torch.from_numpy(vector))
 wordvec_matrix = torch.cat(word_vec_list)
     
-cnn = CNN_clsm(args, wordvec_matrix)
+cnn       = CNN_clsm(args, wordvec_matrix)
 args.cuda = (not args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
+
 if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
