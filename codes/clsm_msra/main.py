@@ -62,7 +62,7 @@ train_data = data.TabularDataset(path=Train_path,
                                         ('neg_doc_5', TEXT) ])
 
 
-train_data, vali_data = train_data.splits(split_ratio=0.9)
+train_data, vali_data = train_data.split(split_ratio=0.9)
 TEXT.build_vocab(train_data, vali_data)
 
 # TEXT.build_vocab(train_data)
