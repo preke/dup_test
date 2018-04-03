@@ -80,7 +80,7 @@ train_iter = data.Iterator(
 
 vali_iter = data.Iterator(
     vali_data, 
-    batch_sizes=len(vali_data),
+    batch_size=len(vali_data),
     device=0,
     repeat=False)
 
