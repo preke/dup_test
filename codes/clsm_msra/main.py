@@ -72,16 +72,18 @@ vali_data = data.TabularDataset(path=Vali_path,
 TEXT.build_vocab(train_data, vali_data)
 
 # TEXT.build_vocab(train_data)
-# train_iter = data.Iterator(train_data,
-#                           batch_size=args.batch_size,
-#                           device=0,
-#                           repeat=False)
-
-train_iter, vali_iter = data.Iterator.splits(
-    (train_data, vali_data), 
-    batch_sizes=(args.batch_size, len(vali_data)),
-    sort_key=None,
+train_iter = data.Iterator(
+    train_data,
+    batch_size=args.batch_size,
+    device=0,
     repeat=False)
+
+vali_iter = data.Iterator(
+    vali_data, 
+    batch_sizes=len(vali_data),
+    device=0,
+    repeat=False)
+
 print('Building vocabulary done. vocabulary length: %s.\n' %str(len(train_data)))
 args.embedding_length = embedding_length
 args.embedding_num    = len(TEXT.vocab)
