@@ -50,9 +50,9 @@ def get_embeddings_and_split_datasets(data_path, prefix, neg_num=5):
             corpus += doc.split(' ') 
     
     
-    wh_instance = WordHashing(corpus)
+    wh_instance      = WordHashing(corpus)
     embedding_length = 0
-    embedding_dict = {}
+    embedding_dict   = {}
     for word in corpus:
         embedding_dict[word] = wh_instance.hashing(word)
         embedding_length     = len(wh_instance.hashing(word))
@@ -67,9 +67,15 @@ def get_embeddings_and_split_datasets(data_path, prefix, neg_num=5):
     data_set = data_set[['query', 'pos_doc', 'neg_doc_1', 'neg_doc_2',
                         'neg_doc_3', 'neg_doc_4', 'neg_doc_5']]
 
-    ratio = 0.8 # train set ratio
-    data_set.head(int(ratio*len(data_set))).to_csv('./datas/train_set.csv', index=False)
-    data_set.tail(int((1-ratio)*len(data_set))).to_csv('./datas/test_set.csv', index=False)
+
+    train_set = data_set.head(int(0.8*len(data_set)))
+    train_set = train_set.head(int(0.9*len(data_set)))
+    vali_set  = train_set.tail(int(0.1*len(data_set)))
+    test_set  = data_set.tail(int(0.2*len(data_set)))
+    
+    train_set.to_csv('./datas/train_set.csv', index=False)
+    vali_set.to_csv('./datas/vali_set.csv', index=False)
+    test_set.to_csv('./datas/test_set.csv', index=False)
     
     return embedding_dict, embedding_length
 

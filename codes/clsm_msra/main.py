@@ -23,6 +23,7 @@ csv.field_size_limit(sys.maxsize)
 
 Data_path  = '../../data/spark.csv'
 Train_path = './datas/train_set.csv'
+Vali_path = './datas/vali_set.csv'
 Test_path  = './datas/test_set.csv'
 
 parser = argparse.ArgumentParser(description='')
@@ -61,8 +62,13 @@ train_data = data.TabularDataset(path=Train_path,
                                         ('neg_doc_2', TEXT), ('neg_doc_3', TEXT), ('neg_doc_4', TEXT),
                                         ('neg_doc_5', TEXT) ])
 
+vali_data = data.TabularDataset(path=Vali_path, 
+                                 format='CSV',
+                                 fields=[('query', TEXT), ('pos_doc', TEXT), ('neg_doc_1', TEXT), 
+                                        ('neg_doc_2', TEXT), ('neg_doc_3', TEXT), ('neg_doc_4', TEXT),
+                                        ('neg_doc_5', TEXT) ])
 
-train_data, vali_data = train_data.split(split_ratio=0.9)
+
 TEXT.build_vocab(train_data, vali_data)
 
 # TEXT.build_vocab(train_data)

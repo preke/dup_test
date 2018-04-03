@@ -14,12 +14,14 @@ class CNN_clsm(nn.Module):
         Ci = 1 # Channel in
         Co = args.kernel_num # 300
         K  = args.kernel_size # 3
-        D  = args.embedding_length
         Ss = args.sementic_size
+        
         V  = args.embedding_num
+        D  = args.embedding_length
 
         self.embedding = nn.Embedding(V, D)
         self.embedding.weight.data.copy_(wordvec_matrix)
+
         self.embedding.weight.requires_grad = False
 
         self.conv    = nn.Conv2d(Ci, Co, (K, D))
