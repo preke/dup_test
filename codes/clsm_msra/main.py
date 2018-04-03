@@ -79,7 +79,8 @@ TEXT.build_vocab(train_data, vali_data)
 
 train_iter, vali_iter = data.Iterator.splits(
     (train_data, vali_data), 
-    batch_sizes=(args.batch_size, len(vali_data)), 
+    batch_sizes=(args.batch_size, len(vali_data)),
+    sort_key=None,
     repeat=False)
 print('Building vocabulary done. vocabulary length: %s.\n' %str(len(train_data)))
 args.embedding_length = embedding_length
