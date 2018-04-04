@@ -51,7 +51,7 @@ def train(train_iter, vali_iter, model, args):
                 sys.stdout.write('\rBatch[{}] - loss: {:.6f}'.format(steps, loss.data[0]))
                 log_file.write('\rBatch[{}] - loss: {:.6f}'.format(steps, loss.data[0]))
             if steps % args.test_interval == 0:
-                vali_loss = eval(vali_iter, model, args)
+                vali_loss = eval(vali_iter, model, args).data[0]
                 print(vali_loss)
                 if vali_loss < min_loss:
                     min_loss = vali_loss
