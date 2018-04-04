@@ -82,7 +82,7 @@ def get_embeddings_and_split_datasets(data_path, prefix, neg_num=5):
         test_pairs.append([r['query'], r['neg_doc_4'], '0'])
         test_pairs.append([r['query'], r['neg_doc_5'], '0'])
 
-    test_pairs = pd.DataFrame(test_pairs, columns=['query', 'doc', 'label'], index=False)
+    test_pairs = pd.DataFrame(test_pairs, columns=['query', 'doc', 'label'])
     
     train_set.to_csv('./datas/train_set.csv', index=False)
     vali_set.to_csv('./datas/vali_set.csv', index=False)
