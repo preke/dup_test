@@ -14,7 +14,7 @@ def train(train_iter, vali_iter, model, args):
     optimizer  = torch.optim.Adam(parameters, lr=args.lr)
     steps      = 0
     last_step  = 0
-    min_loss   = float('inf')
+    min_loss   = 10000
     model.train()
     log_file = open('log.txt', 'w')
     for epoch in range(1, args.epochs+1):
