@@ -73,9 +73,20 @@ def get_embeddings_and_split_datasets(data_path, prefix, neg_num=5):
     vali_set  = train_set.tail(int(0.1*len(data_set)))
     test_set  = data_set.tail(int(0.2*len(data_set)))
     
+    test_pairs = []
+    for i,r in test_set.iterrows():
+        test_pairs.append([r['query'], r['pos_doc'],   '1'])
+        test_pairs.append([r['query'], r['neg_doc_1'], '0'])
+        test_pairs.append([r['query'], r['neg_doc_2'], '0'])
+        test_pairs.append([r['query'], r['neg_doc_3'], '0'])
+        test_pairs.append([r['query'], r['neg_doc_4'], '0'])
+        test_pairs.append([r['query'], r['neg_doc_5'], '0'])
+
+    test_pairs = pd.DataFrame(test_pairs, columns=['query', 'doc', 'label'], index=False)
+    
     train_set.to_csv('./datas/train_set.csv', index=False)
     vali_set.to_csv('./datas/vali_set.csv', index=False)
-    test_set.to_csv('./datas/test_set.csv', index=False)
+    test_pairs.to_csv('./datas/test_set.csv', index=False)
     
     return embedding_dict, embedding_length
 

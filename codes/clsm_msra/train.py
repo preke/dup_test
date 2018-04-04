@@ -52,7 +52,6 @@ def train(train_iter, vali_iter, model, args):
                 log_file.write('\rBatch[{}] - loss: {:.6f}'.format(steps, loss.data[0]))
             if steps % args.test_interval == 0:
                 vali_loss = eval(vali_iter, model, args).data[0]
-                print(vali_loss)
                 if vali_loss < min_loss:
                     min_loss = vali_loss
                     last_step = steps
@@ -98,10 +97,28 @@ def eval(vali_iter, model, args):
             target = target.cuda()
         log_softmax = nn.LogSoftmax(dim = 1)
         loss = criterion(log_softmax(results), target)
-        
         return loss
 
-        
+def test(test_iter, model, args):
+    accuracy = 0.0
+    total_num = 0.0
+    for batch in test_iter:
+        s1, s2, label = batch.s1, batch.s2, batch.label
+        if args.cuda:
+            s1, s2, label = s1.cuda(), s2.cuda(), label.cuda()
+
+        results = model(s1, s2)
+        for i in len(label.data):
+            if (label.data[i] == '1') and (results.data[i] > 0):
+                accuracy += 1.0
+            elif (label.data[i] == '0') and (results.data[i] <= 0):
+                accuracy += 1.0
+            else:
+                pass
+        total_num = len(label.data)
+    print('Accuracy is: %f' %accuracy/total_num)
+
+
 
 
 

@@ -14,7 +14,7 @@ import traceback
 from word_hashing import WordHashing
 from model import CNN_clsm
 from load_data import load_data
-from train import train
+from train import train, test
 import sys
 import csv
 from get_embeddings import get_embeddings_and_split_datasets
@@ -56,6 +56,8 @@ embedding_dict, embedding_length = get_embeddings_and_split_datasets(Data_path, 
 print('Embedding done. Vector length: %s.\n' %str(embedding_length))
 
 TEXT = data.Field(sequential=True, use_vocab=True, batch_first=True)
+label_field  = data.Field(sequential=False)
+
 train_data = data.TabularDataset(path=Train_path, 
                                  format='CSV',
                                  fields=[('query', TEXT), ('pos_doc', TEXT), ('neg_doc_1', TEXT), 
@@ -71,7 +73,6 @@ vali_data = data.TabularDataset(path=Vali_path,
 
 TEXT.build_vocab(train_data, vali_data)
 
-# TEXT.build_vocab(train_data)
 train_iter = data.Iterator(
     train_data,
     batch_size=args.batch_size,
@@ -88,8 +89,6 @@ print('Building vocabulary done. vocabulary length: %s.\n' %str(len(train_data))
 args.embedding_length = embedding_length
 args.embedding_num    = len(TEXT.vocab)
 
-
-
 word_vec_list = []
 for idx, word in enumerate(TEXT.vocab.itos):
     if word in embedding_dict:
@@ -98,18 +97,30 @@ for idx, word in enumerate(TEXT.vocab.itos):
         vector = np.random.rand(1, args.embedding_length)
     word_vec_list.append(torch.from_numpy(vector))
 wordvec_matrix = torch.cat(word_vec_list)
-    
+
 cnn       = CNN_clsm(args, wordvec_matrix)
 args.cuda = (not args.no_cuda) and torch.cuda.is_available(); del args.no_cuda
-
 if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
 
-
 train(train_iter=train_iter, vali_iter=vali_iter, model=cnn, args=args)
 
-test = test()
-test()
+'''
+    test
+'''
+test_data = data.TabularDataset(path=Test_path, 
+                                 format='CSV',
+                                 fields=[('query', TEXT), ('doc', TEXT), ('label', label))
+label.build_vocab(test_data)
+test_iter = data.Iterator(
+    test_data,
+    batch_size=args.batch_size,
+    device=0,
+    repeat=False)
+
+test(test_iter=test_iter, model=cnn, args=args)
+
+
 
 
