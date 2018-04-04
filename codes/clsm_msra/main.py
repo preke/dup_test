@@ -111,7 +111,7 @@ train(train_iter=train_iter, vali_iter=vali_iter, model=cnn, args=args)
 '''
 test_data = data.TabularDataset(path=Test_path, 
                                  format='CSV',
-                                 fields=[('query', TEXT), ('doc', TEXT), ('label', label))
+                                 fields=[('query', TEXT), ('doc', TEXT), ('label', label)])
 label.build_vocab(test_data)
 test_iter = data.Iterator(
     test_data,
