@@ -24,7 +24,10 @@ class CNN_clsm(nn.Module):
 
         self.embedding.weight.requires_grad = False
 
-        self.conv    = nn.Conv2d(Ci, Co, (K, D))
+        self.conv    = nn.Conv2d(in_channels=Ci, 
+                                 out_channels=Co, 
+                                 (K, D),
+                                 stride=1)
         self.dropout = nn.Dropout(args.dropout, self.training)
         self.fc      = nn.Linear(in_features=Co, out_features=Ss)
 
