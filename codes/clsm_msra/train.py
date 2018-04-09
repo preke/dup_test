@@ -109,8 +109,8 @@ def test(test_iter, model, args):
 
         results = model(query, doc)
         for i in range(len(label.data)):
-            print('label:%s\n' %str(label.data[i]))
-            print('results:%s\n' %str(results.data[i]))
+            # print('label:%s\n' %str(label.data[i]))
+            # print('results:%s\n' %str(results.data[i]))
 
             if (label.data[i] == 1) and (results.data[i] > 0):
                 accuracy += 1.0
