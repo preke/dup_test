@@ -121,7 +121,7 @@ else:
 test_data = data.TabularDataset(path=Test_path, 
                                  format='CSV',
                                  fields=[('query', TEXT), ('doc', TEXT), ('label', label_field)])
-label_field.build_vocab(test_data)
+# label_field.build_vocab(test_data)
 test_iter = data.Iterator(
     test_data,
     batch_size=args.batch_size,
