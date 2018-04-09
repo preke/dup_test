@@ -103,11 +103,11 @@ def test(test_iter, model, args):
     accuracy = 0.0
     total_num = 0.0
     for batch in test_iter:
-        s1, s2, label = batch.s1, batch.s2, batch.label
+        query, doc, label = batch.query, batch.doc, batch.label
         if args.cuda:
-            s1, s2, label = s1.cuda(), s2.cuda(), label.cuda()
+            query, doc, label = query.cuda(), doc.cuda(), label.cuda()
 
-        results = model(s1, s2)
+        results = model(query, doc)
         for i in len(label.data):
             if (label.data[i] == '1') and (results.data[i] > 0):
                 accuracy += 1.0
