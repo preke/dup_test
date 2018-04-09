@@ -114,7 +114,7 @@ def test(test_iter, model, args):
 
             if (label.data[i] == 1) and (results.data[i] > 0):
                 accuracy += 1.0
-            elif (label.data[i] == 0) and (results.data[i] <= 0):
+            elif (label.data[i] == 2) and (results.data[i] <= 0):
                 accuracy += 1.0
             else:
                 pass

@@ -58,7 +58,7 @@ embedding_dict, embedding_length = get_embeddings_and_split_datasets(Data_path, 
 print('Embedding done. Vector length: %s.\n' %str(embedding_length))
 
 TEXT = data.Field(sequential=True, use_vocab=True, batch_first=True)
-label_field  = data.Field(sequential=False, use_vocab=False)
+label_field  = data.Field(sequential=False)
 
 train_data = data.TabularDataset(path=Train_path, 
                                  format='CSV',
@@ -121,7 +121,7 @@ else:
 test_data = data.TabularDataset(path=Test_path, 
                                  format='CSV',
                                  fields=[('query', TEXT), ('doc', TEXT), ('label', label_field)])
-# label_field.build_vocab(test_data)
+label_field.build_vocab(test_data)
 test_iter = data.Iterator(
     test_data,
     batch_size=args.batch_size,
