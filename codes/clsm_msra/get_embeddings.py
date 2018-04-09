@@ -75,12 +75,12 @@ def get_embeddings_and_split_datasets(data_path, prefix, neg_num=5):
     
     test_pairs = []
     for i,r in test_set.iterrows():
-        test_pairs.append([r['query'], r['pos_doc'],   '1'])
-        test_pairs.append([r['query'], r['neg_doc_1'], '0'])
-        test_pairs.append([r['query'], r['neg_doc_2'], '0'])
-        test_pairs.append([r['query'], r['neg_doc_3'], '0'])
-        test_pairs.append([r['query'], r['neg_doc_4'], '0'])
-        test_pairs.append([r['query'], r['neg_doc_5'], '0'])
+        test_pairs.append([r['query'], r['pos_doc'],   1])
+        test_pairs.append([r['query'], r['neg_doc_1'], 0])
+        test_pairs.append([r['query'], r['neg_doc_2'], 0])
+        test_pairs.append([r['query'], r['neg_doc_3'], 0])
+        test_pairs.append([r['query'], r['neg_doc_4'], 0])
+        test_pairs.append([r['query'], r['neg_doc_5'], 0])
 
     test_pairs = pd.DataFrame(test_pairs, columns=['query', 'doc', 'label'])
     
