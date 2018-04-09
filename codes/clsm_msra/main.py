@@ -124,7 +124,7 @@ test_data = data.TabularDataset(path=Test_path,
 # label_field.build_vocab(test_data)
 test_iter = data.Iterator(
     test_data,
-    batch_size=args.batch_size,
+    batch_size=1,
     device=0,
     repeat=False)
 
