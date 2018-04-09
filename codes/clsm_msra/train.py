@@ -109,13 +109,19 @@ def test(test_iter, model, args):
 
         results = model(query, doc)
         for i in range(len(label.data)):
+            print('label:%s\n' %str(label.data[i]))
+            print('results:%s\n' %str(results.data[i]))
+
             if (label.data[i] == '1') and (results.data[i] > 0):
                 accuracy += 1.0
             elif (label.data[i] == '0') and (results.data[i] <= 0):
                 accuracy += 1.0
             else:
                 pass
-        total_num = len(label.data)
+        
+        total_num += len(label.data)
+    print(accuracy)
+    print(total_num)
     print('Accuracy is: %s' %str(accuracy/total_num))
 
 
