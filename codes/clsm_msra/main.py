@@ -48,6 +48,8 @@ parser.add_argument('-kernel-size', type=str, default=3, help='comma-separated k
 parser.add_argument('-device', type=int, default=0, help='device to use for iterate data, -1 mean cpu [default: -1]')
 parser.add_argument('-no-cuda', action='store_true', default=False, help='disable the gpu')
 
+parser.add_argument('-snapshot', type=str, default=None, help='filename of model snapshot [default: None]')
+
 args = parser.parse_args()
 
 args.save_dir = os.path.join(args.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
@@ -104,15 +106,22 @@ if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
 
-train(train_iter=train_iter, vali_iter=vali_iter, model=cnn, args=args)
+
+if args.snapshot is not None:
+    print('\nLoading model from {}...'.format(args.snapshot))
+    cnn.load_state_dict(torch.load(args.snapshot))
+else:
+    train(train_iter=train_iter, vali_iter=vali_iter, model=cnn, args=args)
 
 '''
     test
 '''
+
+
 test_data = data.TabularDataset(path=Test_path, 
                                  format='CSV',
                                  fields=[('query', TEXT), ('doc', TEXT), ('label', label)])
-label.build_vocab(test_data)
+label_field.build_vocab(test_data)
 test_iter = data.Iterator(
     test_data,
     batch_size=args.batch_size,
