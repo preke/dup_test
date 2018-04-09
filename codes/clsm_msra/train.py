@@ -116,7 +116,7 @@ def test(test_iter, model, args):
             else:
                 pass
         total_num = len(label.data)
-    print('Accuracy is: %f' %accuracy/total_num)
+    print('Accuracy is: %s' %str(accuracy/total_num))
 
 
 
